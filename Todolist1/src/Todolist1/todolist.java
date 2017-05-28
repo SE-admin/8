@@ -1,0 +1,1412 @@
+package Todolist1;
+
+import java.awt.*;
+import javax.swing.*;
+import javax.swing.table.*;
+import java.awt.event.*;
+import java.io.*;
+import java.util.*;
+import java.util.Arrays;
+
+class log extends JPanel {
+    private File datadir;
+    private File data;
+    private FileReader dataread;
+    private FileWriter datatext;
+    private JLabel Todolist, ID, PASSWD;
+    private JButton login, toregister;
+    private JTextField IDin;
+    private JPasswordField PASSWDin;
+    private Frame TODOLIST;
+    
+    class idpass {
+		private String id;
+		private String pass;
+		
+		idpass(String id, String pass) {
+			this.id = id;
+			this.pass = pass;
+			}
+		public String getId(){
+			return id;
+		}
+		public String getPass() {
+			return pass;
+		}
+	}
+	
+    public void initdatadir() {
+		datadir = new File("C:\\todolist");
+		if(!datadir.exists()) {
+			datadir.mkdirs();
+		}	
+		datadir = new File("C:\\todolist\\ForDefaultToFile");
+		if(!datadir.exists()) {
+			datadir.mkdirs();
+		}
+    }
+    
+    public void initdatafile() {
+    	data = new File("C:\\todolist\\recent.txt");
+    	data = new File("C:\\todolist\\ForDefaultToFile\\ForDefaultToFile.txt");
+    	data = new File("C:\\todolist\\savetext.txt");
+		if(!data.exists()){
+    		try{
+    			datatext = new FileWriter("C:\\todolist\\savetext.txt",false);
+    			datatext.write("ForDefaultToFile ForDefaultToFile ");
+    			datatext.flush();
+    			datatext.close();
+    			
+    			datatext = new FileWriter("C:\\todolist\\recent.txt",false);
+    			datatext.write("ForDefaultToFile ");
+    			datatext.flush();
+    			datatext.close();
+    			
+    			datatext = new FileWriter("C:\\todolist\\ForDefaultToFile\\ForDefaultToFile.txt",false);
+    			datatext.write("ForDefaultToFile ");
+    			datatext.flush();
+    			datatext.close();
+    			
+    		}catch (Exception e) {
+    			System.out.println("오류initdatafile");
+    		}
+		}
+    }
+    
+    public void readdata(idpass idandpass[]) {
+    	try{
+    		int i = 0;
+    		dataread = new FileReader("C:\\todolist\\savetext.txt");
+        	BufferedReader in = new BufferedReader(dataread);
+    		String line = in.readLine();
+    		StringTokenizer tokenizer = new StringTokenizer(line);
+    		i = (tokenizer.countTokens()/2);
+    		
+    		for(int j = 0; j<i;j++){
+	    		String id = tokenizer.nextToken();
+	    		String pass = tokenizer.nextToken();
+	    		idandpass[j] = new idpass(id,pass);
+	    		
+    		}
+    		
+    	}catch (Exception e) {
+    		System.out.println("오류readdata");
+    	}
+    }
+    
+    public int readdatacnt() {
+    	int i = 0;
+    	try{
+    		dataread = new FileReader("C:\\todolist\\savetext.txt");
+        	BufferedReader in = new BufferedReader(dataread);
+    		String line = in.readLine();
+    		StringTokenizer tokenizer = new StringTokenizer(line);
+    		i = (tokenizer.countTokens()/2);
+    		
+    	}catch (Exception e) {
+    		System.out.println("오류readdatacn");
+    	}
+    	return i;
+    }
+    
+
+    
+    public log(Frame TODOLIST){
+        this.TODOLIST = TODOLIST;
+        setLayout(null);
+        
+        Todolist = new JLabel("To do list");
+		Todolist.setLocation(150,3);
+		Todolist.setSize(120,30);
+		Todolist.setFont(new Font("고딕체",Font.BOLD,20));
+		Todolist.setHorizontalAlignment(Todolist.CENTER);
+		add(Todolist);
+		
+		ID = new JLabel("ID");
+		ID.setLocation(100,30);
+		ID.setSize(30,20);
+		ID.setFont(new Font("고딕체",Font.BOLD,15));
+		ID.setHorizontalAlignment(ID.CENTER);
+		add(ID);
+
+		PASSWD = new JLabel("PASSWD");
+		PASSWD.setLocation(50,63);
+		PASSWD.setSize(80,20);
+		PASSWD.setFont(new Font("고딕체",Font.BOLD,15));
+		PASSWD.setHorizontalAlignment(PASSWD.CENTER);
+		add(PASSWD);
+		
+		IDin = new JTextField(10);
+		IDin.setLocation(163,30);
+		IDin.setSize(120,20);
+		add(IDin);
+		
+		PASSWDin = new JPasswordField(10);
+		PASSWDin.setLocation(163,63);
+		PASSWDin.setSize(120,20);
+		PASSWDin.setEchoChar('*');
+		add(PASSWDin);
+		
+		login = new JButton("로그인");
+		login.setLocation(163,86);
+		login.setSize(70,30);
+		login.setFont(new Font("고딕체",Font.BOLD,10));
+		login.addActionListener(new logActionListener());
+		add(login);
+		
+		toregister = new JButton("계정 등록");
+		toregister.setLocation(236,86);
+		toregister.setSize(90,30);
+		toregister.setFont(new Font("고딕체",Font.BOLD,10));
+		toregister.addActionListener(new regActionListener());
+		add(toregister);
+		
+		initdatadir();
+		initdatafile();
+    }
+    
+    class logActionListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+        	Object input = e.getSource();
+        	int i = 0;
+        	i = readdatacnt();	
+        	idpass idandpass[]= new idpass[i];
+        	readdata(idandpass);
+        	if(input==login){
+        		for(int j = 0 ; j<i ; j++){
+	        		if((IDin.getText().equals(idandpass[j].id))&& new String(PASSWDin.getPassword()).equals(idandpass[j].pass)){
+	        			datadir = new File("C:\\todolist\\"+IDin.getText());
+	        			if(!datadir.exists())
+	        				datadir.mkdirs();
+	        			
+	        			data = new File("C:\\todolist\\"+IDin.getText()+"\\"+IDin.getText()+".txt");
+	        			
+	        			if(!data.exists()){
+	        	    		try{
+	        	    			datatext = new FileWriter("C:\\todolist\\"+IDin.getText()+"\\"+IDin.getText()+".txt",false);
+	        	    			datatext.write("ForDefaultToFile ");
+	        	    			datatext.flush();
+	        	    			datatext.close();
+	        	    			
+	        	    			datatext = new FileWriter("C:\\todolist\\recent.txt",false);
+	        	    			datatext.write(IDin.getText());
+	        	    			datatext.flush();
+	        	    			datatext.close();
+	        	    			
+	        	    			datatext = new FileWriter("C:\\todolist\\"+IDin.getText()+"\\todo.txt",false);
+	        	    			datatext.write("ForDefaultToFile ");
+	        	    			datatext.flush();
+	        	    			datatext.close();
+	        	    			
+	        	    		}catch (Exception e1) {
+	        	    			System.out.println("오류");
+	        	    		}
+	        			}
+	        			
+	        			if(data.exists()){
+	        				try{
+	        					datatext = new FileWriter("C:\\todolist\\recent.txt",false);
+	        	    			datatext.write(IDin.getText());
+	        	    			datatext.flush();
+	        	    			datatext.close();
+	        				}catch (Exception e2) {
+	        					System.out.println("오류");
+	        				}
+	        			}
+        				TODOLIST.change("panel3");
+        				break;
+	        		}
+	        		else if(IDin.getText().length()==0){	
+	        			JOptionPane.showMessageDialog(null,"아이디를 입력하십시오.");
+	        		}
+	        		else if(new String(PASSWDin.getPassword()).length()==0){
+	        			JOptionPane.showMessageDialog(null,"패스워드를 입력하십시오.");
+
+	        		}
+	        		else if((i==j+1)&&(IDin.getText().equals(idandpass[j].id))&&!(new String(PASSWDin.getPassword()).equals(idandpass[j].pass))) {
+	        			JOptionPane.showMessageDialog(null,"패스워드가 틀렸습니다.");
+
+	        		}
+	        		else if((i==j+1)&&!(IDin.getText().equals(idandpass[j].id))) {
+	        			JOptionPane.showMessageDialog(null,"등록되지않은 아이디입니다.");
+	        		}
+
+        		}
+        		
+        	}
+        }
+     }
+    
+    class regActionListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+        	Object input = e.getSource();
+        	if(input==toregister)
+        		TODOLIST.change("panel2");
+        }
+     }
+}
+
+class register extends JPanel {
+	
+    private JLabel Register, id, passwd;
+    private JButton register;
+    private JTextField IDmade;
+    private JPasswordField passwdmade;
+    private FileWriter datawrite;
+    private FileReader dataread;
+    private Frame TODOLIST;
+    
+    public int readdata(String id, String pass) {
+    	int q = 0;
+    	try{
+    		int i = 0;
+    		dataread = new FileReader("C:\\todolist\\savetext.txt");
+        	BufferedReader in = new BufferedReader(dataread);
+    		String line = in.readLine();
+    		StringTokenizer tokenizer = new StringTokenizer(line);
+    		i = (tokenizer.countTokens()/2);
+    		
+    		for(int j = 0; j<i;j++){
+	    		String idv= tokenizer.nextToken();
+	    		String passv = tokenizer.nextToken();
+	    		if(idv.equals(id)){
+	    			q = 1;
+	    			break;
+	    		}
+    		}
+    		
+    	}catch (Exception e) {
+    		System.out.println("readdata오류");
+    	}
+    	return q;
+    }
+    
+    public void writedata(String id, String pass) {
+    	try{
+    		datawrite = new FileWriter("C:\\todolist\\savetext.txt",true);
+    		BufferedWriter out = new BufferedWriter(datawrite); 
+    		out.write(" "+id+" "+pass);
+    		out.flush();
+    		out.close();
+    		datawrite.close();
+    	}catch (Exception e) {
+    		System.out.println("writedatals");
+    	}
+    }
+    
+    public register(Frame TODOLIST){
+    	this.TODOLIST = TODOLIST;
+        setLayout(null);
+         
+    	Register = new JLabel("계정 등록");
+    	Register.setLocation(150,3);
+    	Register.setSize(120,30);
+    	Register.setFont(new Font("고딕체",Font.BOLD,20));
+    	Register.setHorizontalAlignment(Register.CENTER);
+		add(Register);
+		
+		id = new JLabel("id");
+		id.setLocation(100,30);
+		id.setSize(30,20);
+		id.setFont(new Font("고딕체",Font.BOLD,15));
+		id.setHorizontalAlignment(id.CENTER);
+		add(id);
+
+		passwd = new JLabel("passwd");
+		passwd.setLocation(50,63);
+		passwd.setSize(80,20);
+		passwd.setFont(new Font("고딕체",Font.BOLD,15));
+		passwd.setHorizontalAlignment(passwd.CENTER);
+		add(passwd);
+		
+		IDmade = new JTextField(10);
+		IDmade.setLocation(163,30);
+		IDmade.setSize(120,20);
+		add(IDmade);
+	
+		passwdmade = new JPasswordField(10);
+		passwdmade.setLocation(163,63);
+		passwdmade.setSize(120,20);
+		passwdmade.setEchoChar('*');
+		add(passwdmade);
+		
+		register = new JButton("계정 등록");
+		register.setLocation(163,86);
+		register.setSize(100,30);
+		register.setFont(new Font("고딕체",Font.BOLD,10));
+		register.addActionListener(new madeActionListener());
+		add(register);
+		
+    }
+    
+    class madeActionListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+        	Object input2 = e.getSource();
+        	String id = IDmade.getText();
+        	String passwd = new String(passwdmade.getPassword());
+        	int quit = readdata(id, passwd);
+        	if(input2==register)
+        		if(id.length()>10){
+        			JOptionPane.showMessageDialog(null,"아이디는 10자 이하입니다.");
+        		}
+        		else if (passwd.length()>10) {
+        			JOptionPane.showMessageDialog(null,"비밀번호는 10자 이하입니다.");
+        		}
+        		else if (id.length()==0) {
+        			JOptionPane.showMessageDialog(null,"아이디를 입력하십시오.");
+        		}
+        		else if (passwd.length()==0) {
+        			JOptionPane.showMessageDialog(null,"비밀번호를 입력하십시오.");
+        		}
+        		else if (quit == 1){
+        			JOptionPane.showMessageDialog(null,"이미 있는 아이디입니다.");
+        		}
+        		else {
+        			writedata(id, passwd);
+        			JOptionPane.showMessageDialog(null,"등록되었습니다.");
+        			TODOLIST.change("panel1");
+        		}
+        }
+     }
+	
+}
+class todolist extends JPanel {
+	private JLabel sub, subname, pro, time, year, seme, todo, todosubname, content, deadline, 
+
+finish, clear, importance, first, second, third;
+	private JButton subsave, submodify, subdelete, todosave, todomodify, tododelete, search, 
+
+sort, select;
+	private JTextField subnamein, proin, timein, yearin, semein, todosubnamein, contentin, 
+
+deadlinein, finishin, clearin, importancein, context;
+	private JTable sublist, todolist;
+	private JScrollPane subscroll, todoscroll;
+	private JComboBox fir, sec, thi, comyear, commonth;
+	private DefaultTableModel subtable;
+	private DefaultTableModel todotable;
+	
+	private String[] rank ={"과목명(오름차순)", "과목명(내림차순)", "마감 기한", "완료 날짜", "완료 여부", "중요도", "-"};
+	private String[] todolistname = { "과옴명", "항목명 (해야할 일)", "마감 기한", "완료 여부", 
+
+"완료 날짜", "중요도" };
+	private String[] syear = {"2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", 
+
+"2021"};
+	private String[] smonth = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"};	
+
+		
+	private String[] sday = {"일", "월", "화", "수", "목", "금", "토"};
+	
+	private String dir;
+	private int row;
+	private int rowtodo;
+	private Calendar today = Calendar.getInstance();
+	
+	private JLabel day[] = new JLabel[7];
+	private JButton date[] = new JButton[42];;
+
+	private int todayyear = today.get(Calendar.YEAR);
+	private int todaymonth = (today.get(Calendar.MONTH)+1);
+	
+	private String toyear = Integer.toString(todayyear);
+	private String tomonth = Integer.toString(todaymonth);
+	
+	private int firstday;
+	private int lastday;
+	
+	private String selyear;
+	private String selmonth;
+	
+	private FileReader dataread;
+	private FileWriter datawriter;
+	
+    private SUB[] subsub = new SUB[10000];
+    private TODO[] todotodo = new TODO[10000];
+	private Frame TODOLIST;
+	
+	class SUB {
+		private String Sub;
+		private String Pro;
+		private String Time;
+		private String Year;
+		private String Seme;
+		
+		SUB(String Sub, String Pro, String Time, String Year, String Seme) {
+			this.Sub = Sub;
+			this.Pro = Pro;
+			this.Time = Time;
+			this.Year = Year;
+			this.Seme = Seme;
+			}
+	}
+	
+	class TODO {
+		private String Todosubname;
+		private String Todocontent;
+		private String Tododeadline;
+		private String Todofinish;
+		private String Todoclear;
+		private String Todoimportance;
+		
+		TODO(String Todosubname, String Todocontent, String Tododeadline, String Todofinish, String Todoclear, String Todoimportance) {
+			this.Todosubname = Todosubname;
+			this.Todocontent = Todocontent;
+			this.Tododeadline = Tododeadline;
+			this.Todofinish = Todofinish;
+			this.Todoclear = Todoclear;
+			this.Todoimportance = Todoimportance;
+			}
+	}
+	
+	public todolist(Frame TODOLIST){
+		this.TODOLIST = TODOLIST;
+        setLayout(null);
+        int i = readsubcnt();
+        int e = readtodocnt();
+        
+        subtable = new DefaultTableModel();
+        subtable.setColumnIdentifiers(new String[] {"과목", "교수", "시간", "년도", "학기"});
+        todotable = new DefaultTableModel();
+        todotable.setColumnIdentifiers(new String[] {"과목명", "항목명(해야할 일)", "마감 기한", "완료 여부", "완료 날짜", "중요도"});
+        
+        sub = new JLabel("과목");
+		sub.setOpaque(true);
+		sub.setBackground(Color.WHITE);
+		sub.setLocation(10,3);
+		sub.setSize(150,30);
+		sub.setFont(new Font("고딕체",Font.BOLD,20));
+		sub.setHorizontalAlignment(sub.CENTER);
+		add(sub);
+		
+		subsave = new JButton("저장");
+		subsave.setLocation(180,5);
+		subsave.setSize(60, 25);
+		subsave.addActionListener(new subaddActionListener());
+		add(subsave);
+		
+		submodify = new JButton("선택");
+		submodify.setLocation(245,5);
+		submodify.setSize(60, 25);
+		submodify.addActionListener(new submodifyActionListener());
+		add(submodify);
+		
+		subdelete = new JButton("삭제");
+		subdelete.setLocation(310,5);
+		subdelete.setSize(60, 25);
+		subdelete.addActionListener(new subdeleteActionListener());
+		add(subdelete);
+		
+		subname = new JLabel("과목명");
+		subname.setOpaque(true);
+		subname.setBackground(Color.GRAY);
+		subname.setFont(new Font("고딕체",Font.BOLD,15));
+		subname.setSize(120,30);
+		subname.setLocation(10,35);
+		subname.setHorizontalAlignment(subname.CENTER);
+		add(subname);
+		
+		pro = new JLabel("담당교수");
+		pro.setOpaque(true);
+		pro.setBackground(Color.GRAY);
+		pro.setFont(new Font("고딕체",Font.BOLD,15));
+		pro.setSize(120,30);
+		pro.setLocation(133,35);
+		pro.setHorizontalAlignment(pro.CENTER);
+		add(pro);
+		
+		time = new JLabel("강의 시간 및 요일");
+		time.setOpaque(true);
+		time.setBackground(Color.GRAY);
+		time.setFont(new Font("고딕체",Font.BOLD,15));
+		time.setSize(170,30);
+		time.setLocation(256,35);
+		time.setHorizontalAlignment(time.CENTER);
+		add(time);
+		
+		year = new JLabel("수강년도");
+		year.setOpaque(true);
+		year.setBackground(Color.GRAY);
+		year.setFont(new Font("고딕체",Font.BOLD,15));
+		year.setSize(120,30);
+		year.setLocation(429,35);
+		year.setHorizontalAlignment(year.CENTER);
+		add(year);
+		
+		seme = new JLabel("학기");
+		seme.setOpaque(true);
+		seme.setBackground(Color.GRAY);
+		seme.setFont(new Font("고딕체",Font.BOLD,15));
+		seme.setSize(120,30);
+		seme.setLocation(552,35);
+		seme.setHorizontalAlignment(seme.CENTER);
+		add(seme);
+        
+		subnamein = new JTextField(20);
+		subnamein.setSize(120,30);
+		subnamein.setLocation(10,65);
+		add(subnamein);
+		
+		proin = new JTextField(20);
+		proin.setSize(120,30);
+		proin.setLocation(133,65);
+		add(proin);
+		
+		timein = new JTextField(20);
+		timein.setSize(170,30);
+		timein.setLocation(256,65);
+		add(timein);
+		
+		yearin = new JTextField(20);
+		yearin.setSize(120,30);
+		yearin.setLocation(429,65);
+		add(yearin);
+
+		semein = new JTextField(20);
+		semein.setSize(120,30);
+		semein.setLocation(552,65);
+		add(semein);
+		
+		sublist = new JTable(subtable);
+		sublist.setSize(660,130);
+		sublist.setLocation(10,100);
+		sublist.addMouseListener(new SubMouseListener());
+		add(sublist);
+		
+		subscroll = new JScrollPane(sublist, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		subscroll.setBounds(10,100,660,130);
+		add(subscroll);
+		
+		todo = new JLabel("항목");
+		todo.setOpaque(true);
+		todo.setBackground(Color.WHITE);
+		todo.setLocation(10,253);
+		todo.setSize(150,30);
+		todo.setFont(new Font("고딕체",Font.BOLD,20));
+		todo.setHorizontalAlignment(todosubname.CENTER);
+		add(todo);
+		
+		todosave = new JButton("저장");
+		todosave.setLocation(180,255);
+		todosave.setSize(60, 25);
+		todosave.addActionListener(new todoaddActionListener());
+		add(todosave);
+		
+		todomodify = new JButton("선택");
+		todomodify.setLocation(245,255);
+		todomodify.setSize(60, 25);
+		todomodify.addActionListener(new todomodifyActionListener());
+		add(todomodify);
+		
+		tododelete = new JButton("삭제");
+		tododelete.setLocation(310,255);
+		tododelete.setSize(60, 25);
+		tododelete.addActionListener(new tododeleteActionListener());
+		add(tododelete);
+		
+		todosubname = new JLabel("과목명");
+		todosubname.setOpaque(true);
+		todosubname.setBackground(Color.GRAY);
+		todosubname.setFont(new Font("고딕체",Font.BOLD,15));
+		todosubname.setSize(120,30);
+		todosubname.setLocation(10,285);
+		todosubname.setHorizontalAlignment(todosubname.CENTER);
+		add(todosubname);
+		
+		todo = new JLabel("항목명(해야할 일)");
+		todo.setOpaque(true);
+		todo.setBackground(Color.GRAY);
+		todo.setFont(new Font("고딕체",Font.BOLD,15));
+		todo.setSize(210,30);
+		todo.setLocation(133,285);
+		todo.setHorizontalAlignment(todo.CENTER);
+		add(todo);
+		
+		deadline = new JLabel("마감 기한");
+		deadline.setOpaque(true);
+		deadline.setBackground(Color.GRAY);
+		deadline.setFont(new Font("고딕체",Font.BOLD,15));
+		deadline.setSize(80,30);
+		deadline.setLocation(346,285);
+		deadline.setHorizontalAlignment(deadline.CENTER);
+		add(deadline);
+		
+		finish = new JLabel("완료 여부");
+		finish.setOpaque(true);
+		finish.setBackground(Color.GRAY);
+		finish.setFont(new Font("고딕체",Font.BOLD,15));
+		finish.setSize(80,30);
+		finish.setLocation(429,285);
+		finish.setHorizontalAlignment(finish.CENTER);
+		add(finish);
+		
+		clear = new JLabel("완료 날짜");
+		clear.setOpaque(true);
+		clear.setBackground(Color.GRAY);
+		clear.setFont(new Font("고딕체",Font.BOLD,15));
+		clear.setSize(80,30);
+		clear.setLocation(512,285);
+		clear.setHorizontalAlignment(clear.CENTER);
+		add(clear);
+		
+		
+		importance = new JLabel("중요도");
+		importance.setOpaque(true);
+		importance.setBackground(Color.GRAY);
+		importance.setFont(new Font("고딕체",Font.BOLD,15));
+		importance.setSize(77,30);
+		importance.setLocation(595,285);
+		importance.setHorizontalAlignment(importance.CENTER);
+		add(importance);
+		
+		todosubnamein = new JTextField(20);
+		todosubnamein.setSize(120,30);
+		todosubnamein.setLocation(10,315);
+		add(todosubnamein);
+		
+		contentin = new JTextField(20);
+		contentin.setSize(210,30);
+		contentin.setLocation(133,315);
+		add(contentin);
+		
+		deadlinein = new JTextField(20);
+		deadlinein.setSize(80,30);
+		deadlinein.setLocation(346,315);
+		add(deadlinein);
+		
+		finishin = new JTextField(20);
+		finishin.setSize(80,30);
+		finishin.setLocation(429,315);
+		add(finishin);
+
+		clearin = new JTextField(20);
+		clearin.setSize(80,30);
+		clearin.setLocation(512,315);
+		add(clearin);
+		
+		importancein = new JTextField(20);
+		importancein.setSize(77,30);
+		importancein.setLocation(595,315);
+		add(importancein);
+		
+		todolist = new JTable(todotable);
+		todolist.setSize(660,200);
+		todolist.setLocation(10,350);
+		todolist.addMouseListener(new TodoMouseListener());
+		add(todolist);
+		
+		todoscroll = new JScrollPane(todolist, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		todoscroll.setBounds(10,350,660,200);
+		add(todoscroll);
+		
+		first = new JLabel("1순위");
+		first.setOpaque(true);
+		first.setBackground(Color.GRAY);
+		first.setFont(new Font("고딕체",Font.BOLD,15));
+		first.setSize(105,27);
+		first.setLocation(680,460);
+		first.setHorizontalAlignment(first.CENTER);
+		add(first);
+		
+		second = new JLabel("2순위");
+		second.setOpaque(true);
+		second.setBackground(Color.GRAY);
+		second.setFont(new Font("고딕체",Font.BOLD,15));
+		second.setSize(105,27);
+		second.setLocation(788,460);
+		second.setHorizontalAlignment(second.CENTER);
+		add(second);
+		
+		third = new JLabel("3순위");
+		third.setOpaque(true);
+		third.setBackground(Color.GRAY);
+		third.setFont(new Font("고딕체",Font.BOLD,15));
+		third.setSize(105,27);
+		third.setLocation(896,460);
+		third.setHorizontalAlignment(third.CENTER);
+		add(third);
+		
+		sort = new JButton("정렬");
+		sort.setSize(70, 25);
+		sort.setLocation(1004,490);
+		sort.addActionListener(new sortActionListener());
+		add(sort);
+		
+		search = new JButton("검색");
+		search.setSize(70, 30);
+		search.setLocation(1004,519);
+		search.addActionListener(new searchActionListener());
+
+		add(search);
+		
+		context = new JTextField(20);
+		context.setSize(321,29);
+		context.setLocation(680,520);
+		add(context);
+		
+		fir = new JComboBox(rank);
+		fir.setSize(105, 25);
+		fir.setLocation(680,490);
+		add(fir);
+		
+		sec = new JComboBox(rank);
+		sec.setSize(105, 25);
+		sec.setLocation(788,490);
+		add(sec);
+		
+		thi = new JComboBox(rank);
+		thi.setSize(105, 25);
+		thi.setLocation(896,490);
+		add(thi);
+		
+		comyear = new JComboBox(syear);
+		comyear.setSelectedItem(toyear);
+		comyear.setSize(100,30);
+		comyear.setLocation(760,30);
+		add(comyear);
+		
+		commonth = new JComboBox(smonth);
+		commonth.setSelectedItem(tomonth);
+		commonth.setSize(100, 30);
+		commonth.setLocation(863,30);
+		add(commonth);
+		
+		select = new JButton("선택");
+		select.setSize(63,30);
+		select.setLocation(1005,30);
+		select.addActionListener(new calActionListener());
+		add(select);
+		
+		selyear = Integer.toString(todayyear);
+		selmonth = Integer.toString(todaymonth);
+		today(todayyear,todaymonth);
+		readsub(subsub);
+		readtodo(todotodo);
+		
+		for(int j = 0; j<i ; j++){
+			subsave(subtable, subsub[j].Sub, subsub[j].Pro, subsub[j].Time, subsub[j].Year, subsub[j].Seme);
+		}
+		for(int b = 0; b<e ; b++) {
+			todosave(todotable, todotodo[b].Todosubname, todotodo[b].Todocontent, todotodo[b].Tododeadline, todotodo[b].Todofinish, todotodo[b].Todoclear, todotodo[b].Todoimportance);
+		}
+		
+		
+	}
+	
+	class calActionListener implements ActionListener {
+		public void actionPerformed(ActionEvent e){
+			Object source = e.getSource();
+			
+			if(source == select) {
+				selyear=comyear.getSelectedItem().toString();
+				selmonth=commonth.getSelectedItem().toString();
+				todayyear = Integer.parseInt(selyear);
+				todaymonth = Integer.parseInt(selmonth);	
+			}
+			
+			for(int a= 0; a<42;a++){
+					date[a].setVisible(false);
+			}
+			
+			today(todayyear,todaymonth);
+		}
+	}
+	
+	public void readsub (SUB subsub[]){
+		try{
+			int i = 0;
+			String ForDefaultToFile;
+    		dataread = new FileReader("C:\\todolist\\recent.txt");
+        	BufferedReader in = new BufferedReader(dataread);
+    		String line = in.readLine();
+    		StringTokenizer tokenizer = new StringTokenizer(line);
+    		dir = tokenizer.nextToken();
+
+    		dataread = new FileReader("C:\\todolist\\"+dir+"\\"+dir+".txt");
+    		in = new BufferedReader(dataread);
+    		line = in.readLine();
+    		tokenizer = new StringTokenizer(line);
+    		i = (tokenizer.countTokens()/5);
+    		ForDefaultToFile = tokenizer.nextToken();
+    		
+    		for(int j = 0; j<i;j++){
+    			String Sub = tokenizer.nextToken();
+    			String Pro = tokenizer.nextToken();
+    			String Time = tokenizer.nextToken();
+    			String Year = tokenizer.nextToken();
+    			String Seme = tokenizer.nextToken();
+	    		subsub[j]=new SUB(Sub, Pro, Time, Year, Seme);
+    		}	
+    	}catch (Exception e7) {
+    		System.out.println("readsub오류");
+    	}
+	}
+	
+	public int readsubcnt(){
+		int i = 0;
+		try{
+    		dataread = new FileReader("C:\\todolist\\recent.txt");
+        	BufferedReader in = new BufferedReader(dataread);
+    		String line = in.readLine();
+    		StringTokenizer tokenizer = new StringTokenizer(line);
+    		dir = tokenizer.nextToken();
+    		
+    		dataread = new FileReader("C:\\todolist\\"+dir+"\\"+dir+".txt");
+    		in = new BufferedReader(dataread);
+    		line = in.readLine();
+    		tokenizer = new StringTokenizer(line);
+    		i = (tokenizer.countTokens()/5);
+    		
+    	}catch (Exception e8) {
+    		System.out.println("readsubcnt오류");
+    	}
+		
+		return i;
+	}
+	
+	public void writesub (SUB sub[],int cnt) {
+		try{
+    		datawriter = new FileWriter("C:\\todolist\\"+dir+"\\"+dir+".txt",false);
+    		BufferedWriter out = new BufferedWriter(datawriter);
+    		out.write("ForDefaultToFile ");
+    		if(cnt==0){
+    			out.write("ForDefaultToFile ");
+    		}
+    		else{
+    			for(int i = 0 ;i<cnt;i++)
+    				out.write(" "+sub[i].Sub+" "+sub[i].Pro+" "+sub[i].Time+" "+sub[i].Year+" "+sub[i].Seme);
+    		}
+    		out.flush();
+    		out.close();
+    		datawriter.close();
+    	}catch (Exception e) {
+    		System.out.println(" writesub ls");
+    	}		
+	}
+	
+	public void subsave (DefaultTableModel table, String Sub, String Pro, String Time, String Year, String Seme){
+		Object sublist[] = {Sub, Pro, Time, Year, Seme};
+		table.addRow(sublist);
+	}
+	
+	public void submodify(DefaultTableModel table, String sub){
+		int i = 0;
+		for(; i<table.getRowCount(); i++){
+			    if(sub.equals(table.getValueAt(i,0)))
+			     table.removeRow(i);
+		}
+	}
+	
+	public void subdelete(DefaultTableModel table, String sub){
+		int k = table.getRowCount();
+		int i = 0;
+		int cnt = readsubcnt();
+		for(; i<table.getRowCount(); i++){
+			    if(sub.equals(table.getValueAt(i,0))){
+			    	table.removeRow(i);
+			    	break;
+			    }
+		}
+		for(;i<cnt-1;i++)
+			subsub[i]=subsub[i+1];
+		writesub(subsub,k-1);
+	}
+	
+	public void readtodo (TODO todotodo[]){
+		try{
+			int i = 0;
+			String ForDefaultToFile;
+    		dataread = new FileReader("C:\\todolist\\recent.txt");
+        	BufferedReader in = new BufferedReader(dataread);
+    		String line = in.readLine();
+    		StringTokenizer tokenizer = new StringTokenizer(line);
+    		dir = tokenizer.nextToken();
+
+    		dataread = new FileReader("C:\\todolist\\"+dir+"\\todo.txt");
+    		in = new BufferedReader(dataread);
+    		line = in.readLine();
+    		tokenizer = new StringTokenizer(line);
+    		i = (tokenizer.countTokens()/6);
+    		ForDefaultToFile = tokenizer.nextToken();
+    		
+    		for(int j = 0; j<i;j++){
+    			String Todosubname = tokenizer.nextToken();
+    			String Todocontent = tokenizer.nextToken();
+    			String Tododeadline = tokenizer.nextToken();
+    			String Todofinish = tokenizer.nextToken();
+    			String Todoclear = tokenizer.nextToken();
+    			String Todoimportance = tokenizer.nextToken();
+	    		todotodo[j]=new TODO(Todosubname, Todocontent, Tododeadline, Todofinish, Todoclear, Todoimportance);
+    		}	
+    	}catch (Exception e7) {
+    		System.out.println("readsub오류");
+    	}
+	}
+	
+	public int readtodocnt(){
+		int i = 0;
+		try{
+    		dataread = new FileReader("C:\\todolist\\recent.txt");
+        	BufferedReader in = new BufferedReader(dataread);
+    		String line = in.readLine();
+    		StringTokenizer tokenizer = new StringTokenizer(line);
+    		dir = tokenizer.nextToken();
+    		
+    		dataread = new FileReader("C:\\todolist\\"+dir+"\\todo.txt");
+    		in = new BufferedReader(dataread);
+    		line = in.readLine();
+    		tokenizer = new StringTokenizer(line);
+    		i = (tokenizer.countTokens()/6);
+    		
+    	}catch (Exception e8) {
+    		System.out.println("readsubcnt오류");
+    	}
+		
+		return i;
+	}
+	
+	public void writetodo (TODO todotodo[],int cnt) {
+		try{
+    		datawriter = new FileWriter("C:\\todolist\\"+dir+"\\todo.txt",false);
+    		BufferedWriter out = new BufferedWriter(datawriter);
+    		if(cnt==0){
+    			out.write("ForDefaultToFile ");
+    		}
+    		else{
+	    		out.write("ForDefaultToFile ");
+	    		for(int i = 0 ;i<cnt;i++)
+	    			out.write(" "+todotodo[i].Todosubname+" "+todotodo[i].Todocontent+" "+todotodo[i].Tododeadline+" "+todotodo[i].Todofinish+" "+todotodo[i].Todoclear+" "+todotodo[i].Todoimportance+" ");
+    		}
+	    	out.flush();
+    		out.close();
+    		datawriter.close();
+    	}catch (Exception e) {
+    		System.out.println(" writesub ls");
+    	}		
+	}
+	
+	public void todosave(DefaultTableModel table, String Todosubname, String Todocontent, String Tododeadline, String Todofinish, String Todoclear, String Todoimportance) {
+		Object todolist[] = {Todosubname, Todocontent, Tododeadline, Todofinish, Todoclear, Todoimportance};
+		table.addRow(todolist);	
+	}
+	
+	public void todomodify(DefaultTableModel table, String Todosubname){
+		int i = 0;
+		for(; i<table.getRowCount(); i++){
+			    if(Todosubname.equals(table.getValueAt(i,0)))
+			     table.removeRow(i);
+		}
+	}
+	
+	public void tododelete(DefaultTableModel table, String Todosubname, String Todocontent){
+		int cnt = readtodocnt();
+		System.out.println(cnt);
+		int k = table.getRowCount();
+		int i = 0;
+		for(; i<table.getRowCount(); i++){
+			    if((Todosubname.equals(table.getValueAt(i,0)))&&(Todocontent.equals(table.getValueAt(i, 1)))){
+			     table.removeRow(i);
+			     break;
+			    }
+		}
+		for(;i<cnt-1;i++)
+			todotodo[i]=todotodo[i+1];
+		writetodo(todotodo,k-1);
+	}
+	
+	public void search (String keyword, DefaultTableModel table) {
+		int cnt = readtodocnt();
+		table.setNumRows(0);
+		if(keyword.length()==0) {
+			for(int j = 0; j<cnt; j++) {
+				Object todolist[] = {todotodo[j].Todosubname, todotodo[j].Todocontent, todotodo[j].Tododeadline, todotodo[j].Todofinish, todotodo[j].Todoclear, todotodo[j].Todoimportance};
+				table.addRow(todolist);
+			}
+		}
+		else  {
+			for (int j =0; j<cnt; j++) {
+				Object todolist[] = {todotodo[j].Todosubname, todotodo[j].Todocontent, todotodo[j].Tododeadline, todotodo[j].Todofinish, todotodo[j].Todoclear, todotodo[j].Todoimportance};
+				String ver = todotodo[j].Todosubname;
+				String ver1 = todotodo[j].Todocontent;
+				String ver2 = todotodo[j].Tododeadline;
+				String ver3 = todotodo[j].Todofinish;
+				String ver4 = todotodo[j].Todoclear;
+				String ver5 = todotodo[j].Todoimportance;
+
+				if(ver.contains(keyword)||ver1.contains(keyword)||ver2.contains(keyword)||ver3.contains(keyword)||ver4.contains(keyword)||ver5.contains(keyword)){
+					table.addRow(todolist);
+				}
+			}
+		}
+	}
+	
+	public void sort(String fir, String sec, String thi, DefaultTableModel table) {
+		int cnt = readtodocnt();
+		table.setNumRows(0);
+		if(fir=="과목명(오름차순)"){
+			String[] s = new String[cnt];
+			int[] s1 = new int[cnt];
+			int s2 = 0;
+			for(int i = 0; i<cnt;i++){
+				s1[i]=-1;
+			}
+			for(int i = 0; i<cnt;i++){
+				s[i]=todotodo[i].Todosubname;
+			}
+			Arrays.sort(s);
+
+			for(int j = 0; j<cnt; j++) {
+				for(int k = 0; k<cnt; k++){
+					if(s[j].equals(todotodo[k].Todosubname)){
+						System.out.println(todotodo[k].Todosubname);
+						for(int m = 0; m<k+1;m++){
+							if(s1[m]==k) {
+								s2=1;
+							}
+						}
+						for(int i = 0; i<cnt;i++){
+							System.out.println(s1[i]);
+						}
+						if(s2!=1) {
+							s1[k]=j;
+							Object todolist[] = {todotodo[k].Todosubname, todotodo[k].Todocontent, todotodo[k].Tododeadline, todotodo[k].Todofinish, todotodo[k].Todoclear, todotodo[k].Todoimportance};
+							table.addRow(todolist);
+						}
+						break;
+					}
+				}
+			}
+		}
+		else if(fir=="과목명(내림차순)") {
+			
+		}
+		else if(fir=="마감 기한") {
+			
+		}
+		else if(fir=="완료 날짜") {
+			
+		}
+		else if(fir=="완료 여부") {
+			
+		}
+		else if(fir=="중요도") {
+			
+		}
+	}
+	
+	class subaddActionListener implements ActionListener {
+		public void actionPerformed(ActionEvent e){
+			Object source = e.getSource();
+			int k = subtable.getRowCount();
+			if(source == subsave) {		
+				if(subnamein.getText()==null)
+        			JOptionPane.showMessageDialog(null,"과목명을 입력하십시오.");
+				else if(proin.getText()==null)
+        			JOptionPane.showMessageDialog(null,"담당 교수를 입력하십시오.");
+				else if(timein.getText()==null)
+        			JOptionPane.showMessageDialog(null,"강의 시간 및 요일을 입력하십시오.");
+				else if(yearin.getText()==null)
+        			JOptionPane.showMessageDialog(null,"수강 년도를 입력하십시오.");
+				else if(semein.getText()==null)
+        			JOptionPane.showMessageDialog(null,"학기를 입력하십시오");
+				else {
+					subsave(subtable, subnamein.getText(),proin.getText(), timein.getText(), yearin.getText(), semein.getText());
+					subsub[k]= new SUB(subnamein.getText(),proin.getText(), timein.getText(), yearin.getText(), semein.getText());
+					writesub(subsub,k+1);
+				}
+			}
+		}
+	}
+	
+	class SubMouseListener implements MouseListener{   
+	    public void mouseClicked(java.awt.event.MouseEvent e) {
+	        JTable jtable = (JTable)e.getSource();
+	        row = jtable.getSelectedRow();             
+	    }
+	    public void mouseEntered(java.awt.event.MouseEvent e) {
+	    }
+	    public void mouseExited(java.awt.event.MouseEvent e) {    
+	    }
+	    public void mousePressed(java.awt.event.MouseEvent e) {
+	    }
+	    public void mouseReleased(java.awt.event.MouseEvent e) {
+	    }
+	}
+	
+	class submodifyActionListener implements ActionListener {
+		public void actionPerformed(ActionEvent e){
+			Object source = e.getSource();
+			int i = readsubcnt();
+			int j = 0;
+			if(source == submodify) {		
+				 subnamein.setText((String) subtable.getValueAt(row, 0));
+			     proin.setText((String) subtable.getValueAt(row, 1));
+			     timein.setText((String) subtable.getValueAt(row, 2));
+			     yearin.setText((String) subtable.getValueAt(row, 3));
+			     semein.setText((String) subtable.getValueAt(row, 4));
+			     submodify(subtable, (String) subtable.getValueAt(row, 0));
+			}
+		}
+	}
+	
+	class subdeleteActionListener implements ActionListener {
+		public void actionPerformed(ActionEvent e){
+			Object source = e.getSource();
+			if(source == subdelete) {	
+			     subdelete(subtable, (String) subtable.getValueAt(row, 0));
+			}
+		}
+	}
+	
+	class todoaddActionListener implements ActionListener {
+		public void actionPerformed(ActionEvent e){
+			Object source = e.getSource();
+			int k = todotable.getRowCount();
+			int m = readsubcnt();
+			int q = 0;
+			if(source == todosave) {
+				if(todosubnamein.getText()==null)
+        			JOptionPane.showMessageDialog(null,"과목명을 입력하십시오.");
+				else if(contentin.getText()==null)
+        			JOptionPane.showMessageDialog(null,"담당 교수를 입력하십시오.");
+				else if(deadlinein.getText()==null)
+        			JOptionPane.showMessageDialog(null,"강의 시간 및 요일을 입력하십시오.");
+				else if(finishin.getText()==null)
+        			JOptionPane.showMessageDialog(null,"수강 년도를 입력하십시오.");
+				else if(clearin.getText()==null)
+        			JOptionPane.showMessageDialog(null,"학기를 입력하십시오");
+				else if(importancein.getText()==null)
+        			JOptionPane.showMessageDialog(null,"학기를 입력하십시오");
+				else {
+					for(int j =0; j<m;j++) {
+						if(todosubnamein.getText().equals(subsub[j].Sub)) {
+							q+=1;
+							break;
+						}
+						else
+							continue;
+					}
+					if(q==1){
+						todosave(todotable, todosubnamein.getText(),contentin.getText(), deadlinein.getText(), finishin.getText(), clearin.getText(), importancein.getText());
+						todotodo[k]= new TODO(todosubnamein.getText(),contentin.getText(), deadlinein.getText(), finishin.getText(), clearin.getText(), importancein.getText());
+						writetodo(todotodo,k+1);
+					}
+					else
+	        			JOptionPane.showMessageDialog(null,"등록된 과목이 없습니다.");
+
+				}
+			}
+		}
+	}
+	
+	class TodoMouseListener implements MouseListener{   
+	    public void mouseClicked(java.awt.event.MouseEvent e) {
+	        JTable jtable = (JTable)e.getSource();
+	        rowtodo = jtable.getSelectedRow();             
+	    }
+	    public void mouseEntered(java.awt.event.MouseEvent e) {
+	    }
+	    public void mouseExited(java.awt.event.MouseEvent e) {    
+	    }
+	    public void mousePressed(java.awt.event.MouseEvent e) {
+	    }
+	    public void mouseReleased(java.awt.event.MouseEvent e) {
+	    }
+	}
+	
+	class todomodifyActionListener implements ActionListener {
+		public void actionPerformed(ActionEvent e){
+			Object source = e.getSource();
+			int i = readtodocnt();
+			int j = 0;
+			if(source == todomodify) {		
+				 todosubnamein.setText((String) todotable.getValueAt(rowtodo, 0));
+			     contentin.setText((String) todotable.getValueAt(rowtodo, 1));
+			     deadlinein.setText((String) todotable.getValueAt(rowtodo, 2));
+			     finishin.setText((String) todotable.getValueAt(rowtodo, 3));
+			     clearin.setText((String) todotable.getValueAt(rowtodo, 4));
+			     importancein.setText((String) todotable.getValueAt(rowtodo, 5));
+			     todomodify(todotable, (String) todotable.getValueAt(rowtodo, 0));
+			}
+		}
+	}
+	
+	class tododeleteActionListener implements ActionListener {
+		public void actionPerformed(ActionEvent e){
+			Object source = e.getSource();
+			if(source == tododelete) {	
+			     tododelete(todotable, (String) todotable.getValueAt(rowtodo, 0), (String) todotable.getValueAt(rowtodo, 1));
+			}
+		}
+	}
+	
+	class searchActionListener implements ActionListener {
+		public void actionPerformed(ActionEvent e){
+			Object source = e.getSource();
+			if(source == search) {
+			    search(context.getText(),todotable);
+			}
+		}
+	}
+	
+	class calselectActionListener implements ActionListener {
+		public void actionPerformed(ActionEvent e){
+			Object source = e.getSource();
+			int j = 0;
+			int click = 0;
+			for(int i =0;i<42;i++){
+				date[i].setBackground(new Color(255,255,255));
+				if(i%7==0)
+					date[i].setForeground(new Color(255,0,0));
+				else  if(i%7==6) 
+					date[i].setForeground(new Color(0,0,255));
+				else
+					date[i].setForeground(new Color(0,0,0));
+				if(source==date[i]){
+					click = i;
+					if(date[i].getText().length()==0)
+	        			JOptionPane.showMessageDialog(null,"날짜를 클릭하십시오.");
+					else{
+						j=Integer.parseInt(date[i].getText());
+						date[click].setBackground(new Color(150,150,150));
+						date[click].setForeground(new Color(234,204,026));
+						String datever = selyear+selmonth+date[click].getText();
+						search(datever, todotable);
+					}
+				}
+			}	
+		}
+	}
+	
+	class sortActionListener implements ActionListener {
+		public void actionPerformed(ActionEvent e){
+			Object source = e.getSource();
+			if(source == sort) {	
+			    sort(fir.getSelectedItem().toString(), sec.getSelectedItem().toString(), thi.getSelectedItem().toString(),todotable);
+			}
+		}
+	}
+	
+	public void today(int year, int month) {
+		GregorianCalendar cal;
+		cal = new GregorianCalendar();
+		
+		int todayyear = cal.get(cal.YEAR);
+		int todaymonth = (cal.get(cal.MONTH)+1);
+		int today = cal.get(cal.DATE);
+		
+		cal.set(year, month-1, 1);
+		firstday = cal.get(cal.DAY_OF_WEEK);
+		lastday = cal.getActualMaximum(cal.DAY_OF_MONTH);
+
+		int j = 700;
+		int l = 90;
+		int i = 0;
+
+		String sdate;
+		
+		for(; i < firstday-1 ; i++) {
+			sdate ="";
+			date[i] = new JButton(sdate);
+			date[i].setSize(50,30);
+			date[i].setLocation(j,l);
+			date[i].setBackground(new Color(255,255,255));
+			date[i].addActionListener(new calselectActionListener());
+			add(date[i]);
+			j+=53;
+			
+			if(i%7==6) {
+				l+=33;
+				j=700; 
+			}
+		}
+		
+		for(int a = 1; a<lastday+1; i++,a++) {
+			sdate =""+a;
+			date[i] = new JButton(sdate);
+			date[i].setSize(50,30);
+			date[i].setLocation(j,l);
+			date[i].setBackground(new Color(255,255,255));
+			date[i].addActionListener(new calselectActionListener());
+			add(date[i]);
+			j+=53;
+			
+			if(i%7==0)
+				date[i].setForeground(new Color(255,0,0));
+
+			else  if(i%7==6) {
+				date[i].setForeground(new Color(0,0,255));
+				l+=33;
+				j=700;
+			}
+			
+			if((year==todayyear)&&(month==todaymonth)&&(today==a)){
+				date[i].setForeground(new Color(0,150,0));
+			}
+		}
+
+		
+		while(i<42) {
+			sdate ="";
+			date[i] = new JButton(sdate);
+			date[i].setSize(50,30);
+			date[i].setLocation(j,l);
+			date[i].setBackground(new Color(255,255,255));
+			date[i].addActionListener(new calselectActionListener());
+			add(date[i]);
+			j+=53;
+			if(i%7==6) {
+				l+=33;
+				j=700;
+				
+			}
+			i++;
+		}
+	}
+}
+
+class Frame extends JFrame{
+    
+    public log jpanel1 = null;
+    public register jpanel2 = null;
+    public todolist jpanel3 = null;
+ 
+    public void change(String panelName){
+        
+        if(panelName.equals("panel2")) {
+            getContentPane().removeAll();
+            getContentPane().add(jpanel2);
+            revalidate();
+            repaint();
+        }
+        
+        else if(panelName.equals("panel1")) {
+        	getContentPane().removeAll();
+            getContentPane().add(jpanel1);
+            revalidate();
+            repaint();
+        }
+        else {
+        	getContentPane().removeAll();
+            getContentPane().add(jpanel3);
+            revalidate();
+            repaint();
+        }
+    }
+    
+    public static void main(String[] args) {
+        
+       Frame TODOLIST = new Frame();            
+        
+       TODOLIST.setTitle("frame test");
+       TODOLIST.jpanel1 = new log(TODOLIST);
+       TODOLIST.jpanel2 = new register(TODOLIST);
+       TODOLIST.jpanel3 = new todolist(TODOLIST);
+  
+       TODOLIST.add(TODOLIST.jpanel1);
+       TODOLIST.jpanel1.setPreferredSize(new Dimension(1100,600));
+       TODOLIST.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+       TODOLIST.pack();
+       TODOLIST.setVisible(true);    
+    }
+}
