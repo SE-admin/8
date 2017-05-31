@@ -1,25 +1,26 @@
 package Todolist1;
 
 import java.awt.*;
-import javax.swing.*;
-import javax.swing.table.*;
 import java.awt.event.*;
 import java.io.*;
+import java.lang.*;
 import java.util.*;
-import java.util.Arrays;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
-class log extends JPanel {
-    private File datadir;
-    private File data;
-    private FileReader dataread;
-    private FileWriter datatext;
-    private JLabel Todolist, ID, PASSWD;
-    private JButton login, toregister;
-    private JTextField IDin;
-    private JPasswordField PASSWDin;
-    private Frame TODOLIST;
-    
-    class idpass {
+class log extends Frame
+{
+	private File datadir;
+	private File data;
+	private FileReader dataread;
+	private FileWriter datatext;
+	private JLabel Todolist, ID, PASSWD;
+	private JButton login, toregister;
+	private JTextField IDin;
+	private JPasswordField PASSWDin;
+	private register rf;
+	private todolist tdl;
+	class idpass {
 		private String id;
 		private String pass;
 		
@@ -47,7 +48,6 @@ class log extends JPanel {
     }
     
     public void initdatafile() {
-    	data = new File("C:\\todolist\\recent.txt");
     	data = new File("C:\\todolist\\ForDefaultToFile\\ForDefaultToFile.txt");
     	data = new File("C:\\todolist\\savetext.txt");
 		if(!data.exists()){
@@ -56,12 +56,7 @@ class log extends JPanel {
     			datatext.write("ForDefaultToFile ForDefaultToFile ");
     			datatext.flush();
     			datatext.close();
-    			
-    			datatext = new FileWriter("C:\\todolist\\recent.txt",false);
-    			datatext.write("ForDefaultToFile ");
-    			datatext.flush();
-    			datatext.close();
-    			
+
     			datatext = new FileWriter("C:\\todolist\\ForDefaultToFile\\ForDefaultToFile.txt",false);
     			datatext.write("ForDefaultToFile ");
     			datatext.flush();
@@ -108,58 +103,66 @@ class log extends JPanel {
     	}
     	return i;
     }
-    
-
-    
-    public log(Frame TODOLIST){
-        this.TODOLIST = TODOLIST;
+        
+    public log(){
+    	super("login");
+    	setSize(400,200);
         setLayout(null);
         
         Todolist = new JLabel("To do list");
-		Todolist.setLocation(150,3);
+		Todolist.setLocation(150,30);
 		Todolist.setSize(120,30);
 		Todolist.setFont(new Font("고딕체",Font.BOLD,20));
 		Todolist.setHorizontalAlignment(Todolist.CENTER);
 		add(Todolist);
 		
 		ID = new JLabel("ID");
-		ID.setLocation(100,30);
+		ID.setLocation(100,73);
 		ID.setSize(30,20);
 		ID.setFont(new Font("고딕체",Font.BOLD,15));
 		ID.setHorizontalAlignment(ID.CENTER);
 		add(ID);
 
 		PASSWD = new JLabel("PASSWD");
-		PASSWD.setLocation(50,63);
+		PASSWD.setLocation(50,103);
 		PASSWD.setSize(80,20);
 		PASSWD.setFont(new Font("고딕체",Font.BOLD,15));
 		PASSWD.setHorizontalAlignment(PASSWD.CENTER);
 		add(PASSWD);
 		
 		IDin = new JTextField(10);
-		IDin.setLocation(163,30);
+		IDin.setLocation(163,73);
 		IDin.setSize(120,20);
 		add(IDin);
 		
 		PASSWDin = new JPasswordField(10);
-		PASSWDin.setLocation(163,63);
+		PASSWDin.setLocation(163,103);
 		PASSWDin.setSize(120,20);
 		PASSWDin.setEchoChar('*');
 		add(PASSWDin);
 		
 		login = new JButton("로그인");
-		login.setLocation(163,86);
+		login.setLocation(143,130);
 		login.setSize(70,30);
 		login.setFont(new Font("고딕체",Font.BOLD,10));
 		login.addActionListener(new logActionListener());
 		add(login);
 		
 		toregister = new JButton("계정 등록");
-		toregister.setLocation(236,86);
+		toregister.setLocation(216,130);
 		toregister.setSize(90,30);
 		toregister.setFont(new Font("고딕체",Font.BOLD,10));
 		toregister.addActionListener(new regActionListener());
 		add(toregister);
+		
+		rf = new register();
+		
+		addWindowListener(new WindowAdapter(){
+			public void windowClosing(WindowEvent e){
+					System.exit(0);
+				}
+			}
+		);
 		
 		initdatadir();
 		initdatafile();
@@ -168,85 +171,93 @@ class log extends JPanel {
     class logActionListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
         	Object input = e.getSource();
-        	int i = 0;
+        	int i = 0, id = 0, pass =0;
         	i = readdatacnt();	
         	idpass idandpass[]= new idpass[i];
         	readdata(idandpass);
-        	if(input==login){
-        		for(int j = 0 ; j<i ; j++){
-	        		if((IDin.getText().equals(idandpass[j].id))&& new String(PASSWDin.getPassword()).equals(idandpass[j].pass)){
-	        			datadir = new File("C:\\todolist\\"+IDin.getText());
-	        			if(!datadir.exists())
-	        				datadir.mkdirs();
-	        			
-	        			data = new File("C:\\todolist\\"+IDin.getText()+"\\"+IDin.getText()+".txt");
-	        			
-	        			if(!data.exists()){
-	        	    		try{
-	        	    			datatext = new FileWriter("C:\\todolist\\"+IDin.getText()+"\\"+IDin.getText()+".txt",false);
-	        	    			datatext.write("ForDefaultToFile ");
-	        	    			datatext.flush();
-	        	    			datatext.close();
-	        	    			
-	        	    			datatext = new FileWriter("C:\\todolist\\recent.txt",false);
-	        	    			datatext.write(IDin.getText());
-	        	    			datatext.flush();
-	        	    			datatext.close();
-	        	    			
-	        	    			datatext = new FileWriter("C:\\todolist\\"+IDin.getText()+"\\todo.txt",false);
-	        	    			datatext.write("ForDefaultToFile ");
-	        	    			datatext.flush();
-	        	    			datatext.close();
-	        	    			
-	        	    		}catch (Exception e1) {
-	        	    			System.out.println("오류");
-	        	    		}
-	        			}
-	        			
-	        			if(data.exists()){
-	        				try{
-	        					datatext = new FileWriter("C:\\todolist\\recent.txt",false);
-	        	    			datatext.write(IDin.getText());
-	        	    			datatext.flush();
-	        	    			datatext.close();
-	        				}catch (Exception e2) {
-	        					System.out.println("오류");
-	        				}
-	        			}
-        				TODOLIST.change("panel3");
-        				break;
-	        		}
-	        		else if(IDin.getText().length()==0){	
+        	if(input==login){	
+	        		if(IDin.getText().length()==0){	
 	        			JOptionPane.showMessageDialog(null,"아이디를 입력하십시오.");
+	        		}
+	        		else if(!IDin.getText().matches("[0-9|a-z|A-Z]*")){
+	        			JOptionPane.showMessageDialog(null,"아이디는 영문이나 숫자 10글자만 가능합니다.");
+   			
 	        		}
 	        		else if(new String(PASSWDin.getPassword()).length()==0){
 	        			JOptionPane.showMessageDialog(null,"패스워드를 입력하십시오.");
 
 	        		}
-	        		else if((i==j+1)&&(IDin.getText().equals(idandpass[j].id))&&!(new String(PASSWDin.getPassword()).equals(idandpass[j].pass))) {
-	        			JOptionPane.showMessageDialog(null,"패스워드가 틀렸습니다.");
-
+	        		else if(!new String(PASSWDin.getPassword()).matches("[0-9|a-z|A-Z]*")) {
+	        			JOptionPane.showMessageDialog(null,"비밀번호는 영문이나 숫자 10글자만 가능합니다.");
+  
 	        		}
-	        		else if((i==j+1)&&!(IDin.getText().equals(idandpass[j].id))) {
-	        			JOptionPane.showMessageDialog(null,"등록되지않은 아이디입니다.");
-	        		}
-
-        		}
-        		
+	        		else {
+		        		for(int j = 0 ; j<i; j++){
+		        			if((IDin.getText().equals(idandpass[j].id))&& new String(PASSWDin.getPassword()).equals(idandpass[j].pass)){
+		        				datadir = new File("C:\\todolist\\"+IDin.getText());
+		        				if(!datadir.exists())
+		        					datadir.mkdirs();
+		        				
+		        				data = new File("C:\\todolist\\"+IDin.getText()+"\\"+IDin.getText()+".txt");
+		        			
+		        				if(!data.exists()){
+		        					try{
+			        	    			datatext = new FileWriter("C:\\todolist\\"+IDin.getText()+"\\"+IDin.getText()+".txt",false);
+			        	    			datatext.write("ForDefaultToFile ");
+			        	    			datatext.flush();
+			        	    			datatext.close();
+			        	    			
+			        	    			datatext = new FileWriter("C:\\todolist\\"+IDin.getText()+"\\todo.txt",false);
+			        	    			datatext.write("ForDefaultToFile ");
+			        	    			datatext.flush();
+			        	    			datatext.close();
+			        	    			
+			        	    		}catch (Exception e1) {
+			        	    			System.out.println("오류");
+			        	    		}
+		        				}
+		        			
+			        			tdl = new todolist(IDin.getText());
+			        			tdl.setSize(1100,600);
+			        			tdl.setVisible(true);
+		        				break;
+		        			}
+			        		if(!(IDin.getText().equals(idandpass[j].id))) {
+			        			id += 1;
+			        			if(id == i){
+				        			JOptionPane.showMessageDialog(null,"등록되지 않은 아이디입니다.");
+				        			break;
+				        		}
+			        		}
+			        		else if((IDin.getText().equals(idandpass[j].id))&&!(new String(PASSWDin.getPassword()).equals(idandpass[j].pass))) {
+			        			JOptionPane.showMessageDialog(null,"패스워드가 틀렸습니다.");
+			        			break;
+			        		}
+		        		}
+		        	}
         	}
         }
-     }
+    }		
     
     class regActionListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
         	Object input = e.getSource();
-        	if(input==toregister)
-        		TODOLIST.change("panel2");
+        	if(input==toregister);
+        		rf.setSize(400,200);
+    			rf.setVisible(true);
         }
      }
+
+    public static void main(String[] args) 
+    {
+    	log d = new log();
+    	d.setSize(400,200);
+		d.setVisible(true);
+    }
+
 }
 
-class register extends JPanel {
+class register extends Frame {
 	
     private JLabel Register, id, passwd;
     private JButton register;
@@ -294,48 +305,56 @@ class register extends JPanel {
     	}
     }
     
-    public register(Frame TODOLIST){
-    	this.TODOLIST = TODOLIST;
-        setLayout(null);
-         
+    public register(){
+    	super("Register");
+        setSize(400,200);
+    	setLayout(null);
+      
     	Register = new JLabel("계정 등록");
-    	Register.setLocation(150,3);
+    	Register.setLocation(150,30);
     	Register.setSize(120,30);
     	Register.setFont(new Font("고딕체",Font.BOLD,20));
     	Register.setHorizontalAlignment(Register.CENTER);
 		add(Register);
 		
 		id = new JLabel("id");
-		id.setLocation(100,30);
+		id.setLocation(100,73);
 		id.setSize(30,20);
 		id.setFont(new Font("고딕체",Font.BOLD,15));
 		id.setHorizontalAlignment(id.CENTER);
 		add(id);
 
 		passwd = new JLabel("passwd");
-		passwd.setLocation(50,63);
+		passwd.setLocation(50,103);
 		passwd.setSize(80,20);
 		passwd.setFont(new Font("고딕체",Font.BOLD,15));
 		passwd.setHorizontalAlignment(passwd.CENTER);
 		add(passwd);
 		
 		IDmade = new JTextField(10);
-		IDmade.setLocation(163,30);
+		IDmade.setLocation(163,73);
 		IDmade.setSize(120,20);
 		add(IDmade);
 	
 		passwdmade = new JPasswordField(10);
-		passwdmade.setLocation(163,63);
+		passwdmade.setLocation(163,103);
 		passwdmade.setSize(120,20);
 		passwdmade.setEchoChar('*');
 		add(passwdmade);
 		
 		register = new JButton("계정 등록");
-		register.setLocation(163,86);
+		register.setLocation(173,130);
 		register.setSize(100,30);
 		register.setFont(new Font("고딕체",Font.BOLD,10));
 		register.addActionListener(new madeActionListener());
 		add(register);
+		
+		addWindowListener(new WindowAdapter(){
+			public void windowClosing(WindowEvent e){
+				dispose();
+				}
+			}
+		);
 		
     }
     
@@ -345,38 +364,45 @@ class register extends JPanel {
         	String id = IDmade.getText();
         	String passwd = new String(passwdmade.getPassword());
         	int quit = readdata(id, passwd);
-        	if(input2==register)
-        		if(id.length()>10){
-        			JOptionPane.showMessageDialog(null,"아이디는 10자 이하입니다.");
-        		}
-        		else if (passwd.length()>10) {
-        			JOptionPane.showMessageDialog(null,"비밀번호는 10자 이하입니다.");
-        		}
-        		else if (id.length()==0) {
+        	if(input2==register){
+        		if (id.length()==0) {
         			JOptionPane.showMessageDialog(null,"아이디를 입력하십시오.");
         		}
-        		else if (passwd.length()==0) {
-        			JOptionPane.showMessageDialog(null,"비밀번호를 입력하십시오.");
+        		else if(!id.matches("[0-9|a-z|A-Z]*")) {
+        			JOptionPane.showMessageDialog(null,"아이디는 영문 또는 숫자입니다.");
+        		}
+        		else if(id.length()>10){
+        			JOptionPane.showMessageDialog(null,"아이디는 10자 이하입니다.");
         		}
         		else if (quit == 1){
         			JOptionPane.showMessageDialog(null,"이미 있는 아이디입니다.");
         		}
+        		else if (passwd.length()==0) {
+        			JOptionPane.showMessageDialog(null,"비밀번호를 입력하십시오.");
+        		}
+        		else if(!passwd.matches("[0-9|a-z|A-Z]*")) {
+        			JOptionPane.showMessageDialog(null,"비밀번호는 영문 또는 숫자입니다.");
+        		}
+        		else if (passwd.length()>10) {
+        			JOptionPane.showMessageDialog(null,"비밀번호는 10자 이하입니다.");
+        		}
         		else {
         			writedata(id, passwd);
         			JOptionPane.showMessageDialog(null,"등록되었습니다.");
-        			TODOLIST.change("panel1");
+					dispose();
         		}
+        	}
         }
      }
-	
 }
-class todolist extends JPanel {
+
+class todolist extends Frame {
 	private JLabel sub, subname, pro, time, year, seme, todo, todosubname, content, deadline, 
 
 finish, clear, importance, first, second, third;
 	private JButton subsave, submodify, subdelete, todosave, todomodify, tododelete, search, 
 
-sort, select;
+sort, select, hide, unhide;
 	private JTextField subnamein, proin, timein, yearin, semein, todosubnamein, contentin, 
 
 deadlinein, finishin, clearin, importancein, context;
@@ -423,8 +449,7 @@ deadlinein, finishin, clearin, importancein, context;
 	
     private SUB[] subsub = new SUB[10000];
     private TODO[] todotodo = new TODO[10000];
-	private Frame TODOLIST;
-	
+
 	class SUB {
 		private String Sub;
 		private String Pro;
@@ -459,12 +484,13 @@ deadlinein, finishin, clearin, importancein, context;
 			}
 	}
 	
-	public todolist(Frame TODOLIST){
-		this.TODOLIST = TODOLIST;
+	public todolist(String path){
+		super("TODOLIST");
+		setSize(1100,600);
         setLayout(null);
+        dir = path;
         int i = readsubcnt();
         int e = readtodocnt();
-        
         subtable = new DefaultTableModel();
         subtable.setColumnIdentifiers(new String[] {"과목", "교수", "시간", "년도", "학기"});
         todotable = new DefaultTableModel();
@@ -473,26 +499,26 @@ deadlinein, finishin, clearin, importancein, context;
         sub = new JLabel("과목");
 		sub.setOpaque(true);
 		sub.setBackground(Color.WHITE);
-		sub.setLocation(10,3);
+		sub.setLocation(10,38);
 		sub.setSize(150,30);
 		sub.setFont(new Font("고딕체",Font.BOLD,20));
 		sub.setHorizontalAlignment(sub.CENTER);
 		add(sub);
 		
 		subsave = new JButton("저장");
-		subsave.setLocation(180,5);
+		subsave.setLocation(180,40);
 		subsave.setSize(60, 25);
 		subsave.addActionListener(new subaddActionListener());
 		add(subsave);
 		
 		submodify = new JButton("선택");
-		submodify.setLocation(245,5);
+		submodify.setLocation(245,40);
 		submodify.setSize(60, 25);
 		submodify.addActionListener(new submodifyActionListener());
 		add(submodify);
 		
 		subdelete = new JButton("삭제");
-		subdelete.setLocation(310,5);
+		subdelete.setLocation(310,40);
 		subdelete.setSize(60, 25);
 		subdelete.addActionListener(new subdeleteActionListener());
 		add(subdelete);
@@ -502,7 +528,7 @@ deadlinein, finishin, clearin, importancein, context;
 		subname.setBackground(Color.GRAY);
 		subname.setFont(new Font("고딕체",Font.BOLD,15));
 		subname.setSize(120,30);
-		subname.setLocation(10,35);
+		subname.setLocation(10,70);
 		subname.setHorizontalAlignment(subname.CENTER);
 		add(subname);
 		
@@ -511,7 +537,7 @@ deadlinein, finishin, clearin, importancein, context;
 		pro.setBackground(Color.GRAY);
 		pro.setFont(new Font("고딕체",Font.BOLD,15));
 		pro.setSize(120,30);
-		pro.setLocation(133,35);
+		pro.setLocation(133,70);
 		pro.setHorizontalAlignment(pro.CENTER);
 		add(pro);
 		
@@ -520,7 +546,7 @@ deadlinein, finishin, clearin, importancein, context;
 		time.setBackground(Color.GRAY);
 		time.setFont(new Font("고딕체",Font.BOLD,15));
 		time.setSize(170,30);
-		time.setLocation(256,35);
+		time.setLocation(256,70);
 		time.setHorizontalAlignment(time.CENTER);
 		add(time);
 		
@@ -529,7 +555,7 @@ deadlinein, finishin, clearin, importancein, context;
 		year.setBackground(Color.GRAY);
 		year.setFont(new Font("고딕체",Font.BOLD,15));
 		year.setSize(120,30);
-		year.setLocation(429,35);
+		year.setLocation(429,70);
 		year.setHorizontalAlignment(year.CENTER);
 		add(year);
 		
@@ -538,78 +564,88 @@ deadlinein, finishin, clearin, importancein, context;
 		seme.setBackground(Color.GRAY);
 		seme.setFont(new Font("고딕체",Font.BOLD,15));
 		seme.setSize(120,30);
-		seme.setLocation(552,35);
+		seme.setLocation(552,70);
 		seme.setHorizontalAlignment(seme.CENTER);
 		add(seme);
         
 		subnamein = new JTextField(20);
 		subnamein.setSize(120,30);
-		subnamein.setLocation(10,65);
+		subnamein.setLocation(10,100);
 		add(subnamein);
 		
 		proin = new JTextField(20);
 		proin.setSize(120,30);
-		proin.setLocation(133,65);
+		proin.setLocation(133,100);
 		add(proin);
 		
 		timein = new JTextField(20);
 		timein.setSize(170,30);
-		timein.setLocation(256,65);
+		timein.setLocation(256,100);
 		add(timein);
 		
 		yearin = new JTextField(20);
 		yearin.setSize(120,30);
-		yearin.setLocation(429,65);
+		yearin.setLocation(429,100);
 		add(yearin);
 
 		semein = new JTextField(20);
 		semein.setSize(120,30);
-		semein.setLocation(552,65);
+		semein.setLocation(552,100);
 		add(semein);
 		
 		sublist = new JTable(subtable);
 		sublist.setSize(660,130);
-		sublist.setLocation(10,100);
+		sublist.setLocation(10,135);
 		sublist.addMouseListener(new SubMouseListener());
 		add(sublist);
 		
 		subscroll = new JScrollPane(sublist, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		subscroll.setBounds(10,100,660,130);
+		subscroll.setBounds(10,135,660,130);
 		add(subscroll);
 		
 		todo = new JLabel("항목");
 		todo.setOpaque(true);
 		todo.setBackground(Color.WHITE);
-		todo.setLocation(10,253);
+		todo.setLocation(10,288);
 		todo.setSize(150,30);
 		todo.setFont(new Font("고딕체",Font.BOLD,20));
 		todo.setHorizontalAlignment(todosubname.CENTER);
 		add(todo);
 		
 		todosave = new JButton("저장");
-		todosave.setLocation(180,255);
+		todosave.setLocation(180,290);
 		todosave.setSize(60, 25);
 		todosave.addActionListener(new todoaddActionListener());
 		add(todosave);
 		
 		todomodify = new JButton("선택");
-		todomodify.setLocation(245,255);
+		todomodify.setLocation(245,290);
 		todomodify.setSize(60, 25);
 		todomodify.addActionListener(new todomodifyActionListener());
 		add(todomodify);
 		
 		tododelete = new JButton("삭제");
-		tododelete.setLocation(310,255);
+		tododelete.setLocation(310,290);
 		tododelete.setSize(60, 25);
 		tododelete.addActionListener(new tododeleteActionListener());
 		add(tododelete);
+		
+		hide = new JButton("숨기기");
+		hide.setLocation(375,290);
+		hide.setSize(75, 25);
+		add(hide);
+		
+		unhide = new JButton("보이기");
+		unhide.setLocation(455,290);
+		unhide.setSize(75, 25);
+		add(unhide);
 		
 		todosubname = new JLabel("과목명");
 		todosubname.setOpaque(true);
 		todosubname.setBackground(Color.GRAY);
 		todosubname.setFont(new Font("고딕체",Font.BOLD,15));
 		todosubname.setSize(120,30);
-		todosubname.setLocation(10,285);
+		todosubname.setLocation(10,320);
 		todosubname.setHorizontalAlignment(todosubname.CENTER);
 		add(todosubname);
 		
@@ -618,7 +654,7 @@ deadlinein, finishin, clearin, importancein, context;
 		todo.setBackground(Color.GRAY);
 		todo.setFont(new Font("고딕체",Font.BOLD,15));
 		todo.setSize(210,30);
-		todo.setLocation(133,285);
+		todo.setLocation(133,320);
 		todo.setHorizontalAlignment(todo.CENTER);
 		add(todo);
 		
@@ -627,7 +663,7 @@ deadlinein, finishin, clearin, importancein, context;
 		deadline.setBackground(Color.GRAY);
 		deadline.setFont(new Font("고딕체",Font.BOLD,15));
 		deadline.setSize(80,30);
-		deadline.setLocation(346,285);
+		deadline.setLocation(346,320);
 		deadline.setHorizontalAlignment(deadline.CENTER);
 		add(deadline);
 		
@@ -636,7 +672,7 @@ deadlinein, finishin, clearin, importancein, context;
 		finish.setBackground(Color.GRAY);
 		finish.setFont(new Font("고딕체",Font.BOLD,15));
 		finish.setSize(80,30);
-		finish.setLocation(429,285);
+		finish.setLocation(429,320);
 		finish.setHorizontalAlignment(finish.CENTER);
 		add(finish);
 		
@@ -645,7 +681,7 @@ deadlinein, finishin, clearin, importancein, context;
 		clear.setBackground(Color.GRAY);
 		clear.setFont(new Font("고딕체",Font.BOLD,15));
 		clear.setSize(80,30);
-		clear.setLocation(512,285);
+		clear.setLocation(512,320);
 		clear.setHorizontalAlignment(clear.CENTER);
 		add(clear);
 		
@@ -655,48 +691,48 @@ deadlinein, finishin, clearin, importancein, context;
 		importance.setBackground(Color.GRAY);
 		importance.setFont(new Font("고딕체",Font.BOLD,15));
 		importance.setSize(77,30);
-		importance.setLocation(595,285);
+		importance.setLocation(595,320);
 		importance.setHorizontalAlignment(importance.CENTER);
 		add(importance);
 		
 		todosubnamein = new JTextField(20);
 		todosubnamein.setSize(120,30);
-		todosubnamein.setLocation(10,315);
+		todosubnamein.setLocation(10,350);
 		add(todosubnamein);
 		
 		contentin = new JTextField(20);
 		contentin.setSize(210,30);
-		contentin.setLocation(133,315);
+		contentin.setLocation(133,350);
 		add(contentin);
 		
 		deadlinein = new JTextField(20);
 		deadlinein.setSize(80,30);
-		deadlinein.setLocation(346,315);
+		deadlinein.setLocation(346,350);
 		add(deadlinein);
 		
 		finishin = new JTextField(20);
 		finishin.setSize(80,30);
-		finishin.setLocation(429,315);
+		finishin.setLocation(429,350);
 		add(finishin);
 
 		clearin = new JTextField(20);
 		clearin.setSize(80,30);
-		clearin.setLocation(512,315);
+		clearin.setLocation(512,350);
 		add(clearin);
 		
 		importancein = new JTextField(20);
 		importancein.setSize(77,30);
-		importancein.setLocation(595,315);
+		importancein.setLocation(595,350);
 		add(importancein);
 		
 		todolist = new JTable(todotable);
 		todolist.setSize(660,200);
-		todolist.setLocation(10,350);
+		todolist.setLocation(10,385);
 		todolist.addMouseListener(new TodoMouseListener());
 		add(todolist);
 		
 		todoscroll = new JScrollPane(todolist, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		todoscroll.setBounds(10,350,660,200);
+		todoscroll.setBounds(10,385,660,200);
 		add(todoscroll);
 		
 		first = new JLabel("1순위");
@@ -704,7 +740,7 @@ deadlinein, finishin, clearin, importancein, context;
 		first.setBackground(Color.GRAY);
 		first.setFont(new Font("고딕체",Font.BOLD,15));
 		first.setSize(105,27);
-		first.setLocation(680,460);
+		first.setLocation(680,495);
 		first.setHorizontalAlignment(first.CENTER);
 		add(first);
 		
@@ -713,7 +749,7 @@ deadlinein, finishin, clearin, importancein, context;
 		second.setBackground(Color.GRAY);
 		second.setFont(new Font("고딕체",Font.BOLD,15));
 		second.setSize(105,27);
-		second.setLocation(788,460);
+		second.setLocation(788,495);
 		second.setHorizontalAlignment(second.CENTER);
 		add(second);
 		
@@ -722,58 +758,58 @@ deadlinein, finishin, clearin, importancein, context;
 		third.setBackground(Color.GRAY);
 		third.setFont(new Font("고딕체",Font.BOLD,15));
 		third.setSize(105,27);
-		third.setLocation(896,460);
+		third.setLocation(896,495);
 		third.setHorizontalAlignment(third.CENTER);
 		add(third);
 		
 		sort = new JButton("정렬");
 		sort.setSize(70, 25);
-		sort.setLocation(1004,490);
+		sort.setLocation(1004,525);
 		sort.addActionListener(new sortActionListener());
 		add(sort);
 		
 		search = new JButton("검색");
 		search.setSize(70, 30);
-		search.setLocation(1004,519);
+		search.setLocation(1004,554);
 		search.addActionListener(new searchActionListener());
 
 		add(search);
 		
 		context = new JTextField(20);
 		context.setSize(321,29);
-		context.setLocation(680,520);
+		context.setLocation(680,555);
 		add(context);
 		
 		fir = new JComboBox(rank);
 		fir.setSize(105, 25);
-		fir.setLocation(680,490);
+		fir.setLocation(680,525);
 		add(fir);
 		
 		sec = new JComboBox(rank);
 		sec.setSize(105, 25);
-		sec.setLocation(788,490);
+		sec.setLocation(788,525);
 		add(sec);
 		
 		thi = new JComboBox(rank);
 		thi.setSize(105, 25);
-		thi.setLocation(896,490);
+		thi.setLocation(896,525);
 		add(thi);
 		
 		comyear = new JComboBox(syear);
 		comyear.setSelectedItem(toyear);
 		comyear.setSize(100,30);
-		comyear.setLocation(760,30);
+		comyear.setLocation(760,65);
 		add(comyear);
 		
 		commonth = new JComboBox(smonth);
 		commonth.setSelectedItem(tomonth);
 		commonth.setSize(100, 30);
-		commonth.setLocation(863,30);
+		commonth.setLocation(863,65);
 		add(commonth);
 		
 		select = new JButton("선택");
 		select.setSize(63,30);
-		select.setLocation(1005,30);
+		select.setLocation(1005,65);
 		select.addActionListener(new calActionListener());
 		add(select);
 		
@@ -783,12 +819,29 @@ deadlinein, finishin, clearin, importancein, context;
 		readsub(subsub);
 		readtodo(todotodo);
 		
+		for(int daylabel = 0; daylabel<7; daylabel++) {
+			day[daylabel] = new JLabel(sday[daylabel]);
+			day[daylabel].setSize(50, 30);
+			day[daylabel].setLocation(720+daylabel*53,95);
+			if(daylabel==0)
+				day[daylabel].setForeground(new Color(255,0,0));
+			else if(daylabel == 6)
+				day[daylabel].setForeground(new Color(0,0,255));
+			add(day[daylabel]);
+		}
+		
 		for(int j = 0; j<i ; j++){
 			subsave(subtable, subsub[j].Sub, subsub[j].Pro, subsub[j].Time, subsub[j].Year, subsub[j].Seme);
 		}
 		for(int b = 0; b<e ; b++) {
 			todosave(todotable, todotodo[b].Todosubname, todotodo[b].Todocontent, todotodo[b].Tododeadline, todotodo[b].Todofinish, todotodo[b].Todoclear, todotodo[b].Todoimportance);
 		}
+		addWindowListener(new WindowAdapter(){
+			public void windowClosing(WindowEvent e){
+				dispose();
+				}
+			}
+		);
 		
 		
 	}
@@ -816,15 +869,10 @@ deadlinein, finishin, clearin, importancein, context;
 		try{
 			int i = 0;
 			String ForDefaultToFile;
-    		dataread = new FileReader("C:\\todolist\\recent.txt");
-        	BufferedReader in = new BufferedReader(dataread);
+			dataread = new FileReader("C:\\todolist\\"+dir+"\\"+dir+".txt");
+    		BufferedReader in = new BufferedReader(dataread);
     		String line = in.readLine();
     		StringTokenizer tokenizer = new StringTokenizer(line);
-    		dir = tokenizer.nextToken();
-
-    		dataread = new FileReader("C:\\todolist\\"+dir+"\\"+dir+".txt");
-    		in = new BufferedReader(dataread);
-    		line = in.readLine();
     		tokenizer = new StringTokenizer(line);
     		i = (tokenizer.countTokens()/5);
     		ForDefaultToFile = tokenizer.nextToken();
@@ -845,16 +893,10 @@ deadlinein, finishin, clearin, importancein, context;
 	public int readsubcnt(){
 		int i = 0;
 		try{
-    		dataread = new FileReader("C:\\todolist\\recent.txt");
-        	BufferedReader in = new BufferedReader(dataread);
+    		dataread = new FileReader("C:\\todolist\\"+dir+"\\"+dir+".txt");
+    		BufferedReader in = new BufferedReader(dataread);
     		String line = in.readLine();
     		StringTokenizer tokenizer = new StringTokenizer(line);
-    		dir = tokenizer.nextToken();
-    		
-    		dataread = new FileReader("C:\\todolist\\"+dir+"\\"+dir+".txt");
-    		in = new BufferedReader(dataread);
-    		line = in.readLine();
-    		tokenizer = new StringTokenizer(line);
     		i = (tokenizer.countTokens()/5);
     		
     	}catch (Exception e8) {
@@ -916,16 +958,11 @@ deadlinein, finishin, clearin, importancein, context;
 		try{
 			int i = 0;
 			String ForDefaultToFile;
-    		dataread = new FileReader("C:\\todolist\\recent.txt");
-        	BufferedReader in = new BufferedReader(dataread);
-    		String line = in.readLine();
-    		StringTokenizer tokenizer = new StringTokenizer(line);
-    		dir = tokenizer.nextToken();
 
     		dataread = new FileReader("C:\\todolist\\"+dir+"\\todo.txt");
-    		in = new BufferedReader(dataread);
-    		line = in.readLine();
-    		tokenizer = new StringTokenizer(line);
+    		BufferedReader in = new BufferedReader(dataread);
+    		String line = in.readLine();
+    		StringTokenizer tokenizer = new StringTokenizer(line);
     		i = (tokenizer.countTokens()/6);
     		ForDefaultToFile = tokenizer.nextToken();
     		
@@ -946,16 +983,10 @@ deadlinein, finishin, clearin, importancein, context;
 	public int readtodocnt(){
 		int i = 0;
 		try{
-    		dataread = new FileReader("C:\\todolist\\recent.txt");
-        	BufferedReader in = new BufferedReader(dataread);
+    		dataread = new FileReader("C:\\todolist\\"+dir+"\\todo.txt");
+    		BufferedReader in = new BufferedReader(dataread);
     		String line = in.readLine();
     		StringTokenizer tokenizer = new StringTokenizer(line);
-    		dir = tokenizer.nextToken();
-    		
-    		dataread = new FileReader("C:\\todolist\\"+dir+"\\todo.txt");
-    		in = new BufferedReader(dataread);
-    		line = in.readLine();
-    		tokenizer = new StringTokenizer(line);
     		i = (tokenizer.countTokens()/6);
     		
     	}catch (Exception e8) {
@@ -1300,7 +1331,7 @@ deadlinein, finishin, clearin, importancein, context;
 		lastday = cal.getActualMaximum(cal.DAY_OF_MONTH);
 
 		int j = 700;
-		int l = 90;
+		int l = 125;
 		int i = 0;
 
 		String sdate;
@@ -1361,52 +1392,8 @@ deadlinein, finishin, clearin, importancein, context;
 				
 			}
 			i++;
+			
 		}
 	}
 }
 
-class Frame extends JFrame{
-    
-    public log jpanel1 = null;
-    public register jpanel2 = null;
-    public todolist jpanel3 = null;
- 
-    public void change(String panelName){
-        
-        if(panelName.equals("panel2")) {
-            getContentPane().removeAll();
-            getContentPane().add(jpanel2);
-            revalidate();
-            repaint();
-        }
-        
-        else if(panelName.equals("panel1")) {
-        	getContentPane().removeAll();
-            getContentPane().add(jpanel1);
-            revalidate();
-            repaint();
-        }
-        else {
-        	getContentPane().removeAll();
-            getContentPane().add(jpanel3);
-            revalidate();
-            repaint();
-        }
-    }
-    
-    public static void main(String[] args) {
-        
-       Frame TODOLIST = new Frame();            
-        
-       TODOLIST.setTitle("frame test");
-       TODOLIST.jpanel1 = new log(TODOLIST);
-       TODOLIST.jpanel2 = new register(TODOLIST);
-       TODOLIST.jpanel3 = new todolist(TODOLIST);
-  
-       TODOLIST.add(TODOLIST.jpanel1);
-       TODOLIST.jpanel1.setPreferredSize(new Dimension(1100,600));
-       TODOLIST.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-       TODOLIST.pack();
-       TODOLIST.setVisible(true);    
-    }
-}
