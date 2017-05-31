@@ -4,7 +4,10 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.lang.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
@@ -440,6 +443,7 @@ class todolist extends Frame {
     private SUB[] subsub = new SUB[10000];
     private TODO[] todotodo = new TODO[10000];
 
+    
 	class SUB {
 		private String Sub;
 		private String Pro;
@@ -1007,21 +1011,35 @@ class todolist extends Frame {
 	}
 	
 	public void todosave(DefaultTableModel table, String Todosubname, String Todocontent, String Tododeadline, String Todofinish, String Todoclear, String Todoimportance) {
-		Object todolist[] = {Todosubname, Todocontent, Tododeadline, Todofinish, Todoclear, Todoimportance};
-		table.addRow(todolist);	
+		int k = table.getRowCount();
+		Object listtodo[] = {Todosubname, Todocontent, Tododeadline, Todofinish, Todoclear, Todoimportance};
+		table.addRow(listtodo);	
+		for(int i = 0; i<k;i++){
+			if("0".equals(table.getValueAt(i,5))){
+				
+			}
+			else if("1".equals(table.getValueAt(i,5))){
+				
+			}
+			else if("2".equals(table.getValueAt(i,5))){
+				
+			}
+			else{
+		
+			}
+		}
 	}
 	
-	public void todomodify(DefaultTableModel table, String Todosubname){
+	public void todomodify(DefaultTableModel table, String Todosubname, String Todocontent, String Tododeadline, String Todofinish, String Todoclear, String Todoimportance){
 		int i = 0;
 		for(; i<table.getRowCount(); i++){
-			    if(Todosubname.equals(table.getValueAt(i,0)))
+			    if(Todosubname.equals(table.getValueAt(i,0))||Todocontent.equals(table.getValueAt(i,1))||Tododeadline.equals(table.getValueAt(i,2))||Todofinish.equals(table.getValueAt(i,3))||Todoclear.equals(table.getValueAt(i,4))||Todoimportance.equals(table.getValueAt(i,5)))
 			     table.removeRow(i);
 		}
 	}
 	
 	public void tododelete(DefaultTableModel table, String Todosubname, String Todocontent, String Tododeadline, String Todofinish, String Todoclear, String Todoimportance){
 		int cnt = readtodocnt();
-		System.out.println(cnt);
 		int k = table.getRowCount();
 		int i = 0;
 		for(; i<table.getRowCount(); i++){
@@ -1063,55 +1081,116 @@ class todolist extends Frame {
 	
 	public void sort(String fir, String sec, String thi, DefaultTableModel table) {
 		int cnt = readtodocnt();
-		table.setNumRows(0);
-		if(fir=="과목명(오름차순)"){
-			String[] s = new String[cnt];
-			int[] s1 = new int[cnt];
-			int s2 = 0;
-			for(int i = 0; i<cnt;i++){
-				s1[i]=-1;
-			}
-			for(int i = 0; i<cnt;i++){
-				s[i]=todotodo[i].Todosubname;
-			}
-			Arrays.sort(s);
-
-			for(int j = 0; j<cnt; j++) {
-				for(int k = 0; k<cnt; k++){
-					if(s[j].equals(todotodo[k].Todosubname)){
-						System.out.println(todotodo[k].Todosubname);
-						for(int m = 0; m<k+1;m++){
-							if(s1[m]==k) {
-								s2=1;
-							}
-						}
-						for(int i = 0; i<cnt;i++){
-							System.out.println(s1[i]);
-						}
-						if(s2!=1) {
-							s1[k]=j;
-							Object todolist[] = {todotodo[k].Todosubname, todotodo[k].Todocontent, todotodo[k].Tododeadline, todotodo[k].Todofinish, todotodo[k].Todoclear, todotodo[k].Todoimportance};
-							table.addRow(todolist);
-						}
-						break;
+		String ver1, ver2;
+		int ver3, ver4;
+		TODO temp[]=new TODO[1];
+		if(fir.equals("과목명(오름차순)")){
+			for(int i = 0 ;i<cnt;i++){
+				for(int j = i; j<cnt; j++){
+					ver1=(String) table.getValueAt(i, 0);
+					ver2=(String) table.getValueAt(j, 0);
+					if(ver1.compareTo(ver2)>0){
+						temp[0]=todotodo[i];
+						todotodo[i]=todotodo[j];
+						todotodo[j]=temp[0];
 					}
 				}
 			}
+			table.setNumRows(0);
+			for(int j = 0; j<cnt; j++) {
+				Object todolist[] = {todotodo[j].Todosubname, todotodo[j].Todocontent, todotodo[j].Tododeadline, todotodo[j].Todofinish, todotodo[j].Todoclear, todotodo[j].Todoimportance};
+				table.addRow(todolist);
+			}
 		}
-		else if(fir=="과목명(내림차순)") {
-			
+		else if(fir.equals("과목명(내림차순)")) {
+			for(int i = 0 ;i<cnt;i++){
+				for(int j = i; j<cnt; j++){
+					ver1=(String) table.getValueAt(i, 0);
+					ver2=(String) table.getValueAt(j, 0);
+					if(ver1.compareTo(ver2)<0){
+						temp[0]=todotodo[i];
+						todotodo[i]=todotodo[j];
+						todotodo[j]=temp[0];
+					}
+				}
+			}
+			table.setNumRows(0);
+			for(int j = 0; j<cnt; j++) {
+				Object todolist[] = {todotodo[j].Todosubname, todotodo[j].Todocontent, todotodo[j].Tododeadline, todotodo[j].Todofinish, todotodo[j].Todoclear, todotodo[j].Todoimportance};
+				table.addRow(todolist);
+			}
 		}
-		else if(fir=="마감 기한") {
-			
+		else if(fir.equals("마감 기한")) {
+			for(int i = 0 ;i<cnt;i++){
+				for(int j = i; j<cnt; j++){
+					ver1=(String) table.getValueAt(i, 2);
+					ver2=(String) table.getValueAt(j, 2);
+					if(ver1.compareTo(ver2)>0){
+						temp[0]=todotodo[i];
+						todotodo[i]=todotodo[j];
+						todotodo[j]=temp[0];
+					}
+				}
+			}
+			table.setNumRows(0);
+			for(int j = 0; j<cnt; j++) {
+				Object todolist[] = {todotodo[j].Todosubname, todotodo[j].Todocontent, todotodo[j].Tododeadline, todotodo[j].Todofinish, todotodo[j].Todoclear, todotodo[j].Todoimportance};
+				table.addRow(todolist);
+			}
 		}
-		else if(fir=="완료 날짜") {
-			
+		else if(fir.equals("완료 여부")) {
+			for(int i = 0 ;i<cnt;i++){
+				for(int j = i; j<cnt; j++){
+					ver1=(String) table.getValueAt(i, 3);
+					ver2=(String) table.getValueAt(j, 3);
+					if(ver1.compareTo(ver2)>0){
+						temp[0]=todotodo[i];
+						todotodo[i]=todotodo[j];
+						todotodo[j]=temp[0];
+					}
+				}
+			}
+			table.setNumRows(0);
+			for(int j = 0; j<cnt; j++) {
+				Object todolist[] = {todotodo[j].Todosubname, todotodo[j].Todocontent, todotodo[j].Tododeadline, todotodo[j].Todofinish, todotodo[j].Todoclear, todotodo[j].Todoimportance};
+				table.addRow(todolist);
+			}
 		}
-		else if(fir=="완료 여부") {
-			
+		else if(fir.equals("완료 날짜")) {
+			for(int i = 0 ;i<cnt;i++){
+				for(int j = i; j<cnt; j++){
+					ver1=(String) table.getValueAt(i, 4);
+					ver2=(String) table.getValueAt(j, 4);
+					if(ver1.compareTo(ver2)>0){
+						temp[0]=todotodo[i];
+						todotodo[i]=todotodo[j];
+						todotodo[j]=temp[0];
+					}
+				}
+			}
+			table.setNumRows(0);
+			for(int j = 0; j<cnt; j++) {
+				Object todolist[] = {todotodo[j].Todosubname, todotodo[j].Todocontent, todotodo[j].Tododeadline, todotodo[j].Todofinish, todotodo[j].Todoclear, todotodo[j].Todoimportance};
+				table.addRow(todolist);
+			}
 		}
-		else if(fir=="중요도") {
-			
+		else if(fir.equals("중요도")) {
+			for(int i = 0 ;i<cnt;i++){
+				for(int j = i; j<cnt; j++){
+					ver1=(String) table.getValueAt(i, 5);
+					ver2=(String) table.getValueAt(j, 5);
+					if(ver1.compareTo(ver2)>0){
+						temp[0]=todotodo[i];
+						todotodo[i]=todotodo[j];
+						todotodo[j]=temp[0];
+					}
+				}
+			}
+			table.setNumRows(0);
+			for(int j = 0; j<cnt; j++) {
+				Object todolist[] = {todotodo[j].Todosubname, todotodo[j].Todocontent, todotodo[j].Tododeadline, todotodo[j].Todofinish, todotodo[j].Todoclear, todotodo[j].Todoimportance};
+				table.addRow(todolist);
+			}
 		}
 	}
 	
@@ -1122,24 +1201,22 @@ class todolist extends Frame {
 			int q = 0;
 			int inyear = 0;
 			if(source == subsave) {		
-				
-				if(yearin.getText().matches("[0-9]*"))
+				if(yearin.getText().matches(".*[0-9].*"))
 					inyear = Integer.parseInt(yearin.getText());
-				
-				if(subnamein.getText()==null)
+				if(subnamein.getText().length()==0)
         			JOptionPane.showMessageDialog(null,"과목명을 입력하십시오.");
-				else if(proin.getText()==null)
+				else if(proin.getText().length()==0)
         			JOptionPane.showMessageDialog(null,"담당 교수를 입력하십시오.");
-				else if(timein.getText()==null)
+				else if(timein.getText().length()==0)
         			JOptionPane.showMessageDialog(null,"강의 시간 및 요일을 입력하십시오.");
 				/*else if(timein.getText()==null){
 				}*/
-				else if(yearin.getText()==null)
+				else if(yearin.getText().length()==0)
         			JOptionPane.showMessageDialog(null,"수강 년도를 입력하십시오.");
-				else if(inyear<2013||inyear>2020||!yearin.getText().matches("[0-9]*")){
+				else if(inyear<2013||inyear>2020||!yearin.getText().matches(".*[0-9].*")){
         			JOptionPane.showMessageDialog(null,"수강 년도의 범위는 2013년부터 2020년까지입니다.");
 				}
-				else if(semein.getText()==null)
+				else if(semein.getText().length()==0)
         			JOptionPane.showMessageDialog(null,"학기를 입력하십시오");
 				else if(!semein.getText().equals("1학기")&&!semein.getText().equals("2학기")) {
         			JOptionPane.showMessageDialog(null,"학기의 범위는 1학기, 2학기입니다.");
@@ -1220,36 +1297,79 @@ class todolist extends Frame {
 			int k = todotable.getRowCount();
 			int m = readsubcnt();
 			int q = 0;
+			String pattern = "(20)(1[3-9]|20)(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])";
+			Pattern p = Pattern.compile(pattern);
+			Matcher ma = p.matcher(deadlinein.getText());
+			Matcher mb = p.matcher(clearin.getText());
+			String deadin = deadlinein.getText();
+			String clein = clearin.getText();
+			String inyear, inmonth, inday;
+			GregorianCalendar calver = new GregorianCalendar();
 			if(source == todosave) {
-				if(todosubnamein.getText()==null)
+				if(todosubnamein.getText().length()==0)
         			JOptionPane.showMessageDialog(null,"과목명을 입력하십시오.");
-				else if(contentin.getText()==null)
-        			JOptionPane.showMessageDialog(null,"담당 교수를 입력하십시오.");
-				else if(deadlinein.getText()==null)
-        			JOptionPane.showMessageDialog(null,"강의 시간 및 요일을 입력하십시오.");
-				else if(finishin.getText()==null)
-        			JOptionPane.showMessageDialog(null,"수강 년도를 입력하십시오.");
-				else if(clearin.getText()==null)
-        			JOptionPane.showMessageDialog(null,"학기를 입력하십시오");
-				else if(importancein.getText()==null)
-        			JOptionPane.showMessageDialog(null,"학기를 입력하십시오");
-				else {
-					for(int j =0; j<m;j++) {
-						if(todosubnamein.getText().equals(subsub[j].Sub)) {
-							q+=1;
-							break;
+				else if(contentin.getText().length()==0)
+        			JOptionPane.showMessageDialog(null,"항목명(해야할 일)을 입력하십시오.");
+				else if(deadlinein.getText().length()==0)
+        			JOptionPane.showMessageDialog(null,"마감 기한을 입력하십시오.");
+				else if(!ma.matches()){
+        			JOptionPane.showMessageDialog(null,"마감 기한 입력 형식은 yyyyMMdd이며 범위는 20130101~20201231까지입니다. \n달력에 있는 날짜를 입력하세요.");
+				}
+				else if(ma.matches()){
+					inyear = deadin.substring(0,4);
+					inmonth = deadin.substring(4,6);
+					inday = deadin.substring(6,8);
+					int year = Integer.parseInt(inyear);
+					int month = Integer.parseInt(inmonth);
+					int day = Integer.parseInt(inday);
+					calver.set(year,month-1,1);
+					int lastdayver = calver.getActualMaximum(calver.DAY_OF_MONTH);
+					if(Integer.parseInt(inday)>lastdayver){
+	        			JOptionPane.showMessageDialog(null,"마감 기한 입력 형식은 yyyyMMdd이며 범위는 20130101~20201231까지입니다. \n달력에 있는 날짜를 입력하세요.");
+					}
+					else if(finishin.getText().length()==0)
+	        			JOptionPane.showMessageDialog(null,"완료 여부를 입력하십시오.");
+					else if(!finishin.getText().matches("[o|x]*"))
+	        			JOptionPane.showMessageDialog(null,"완료 여부는 o,x만 가능합니다.");
+					else if(clearin.getText().length()==0)
+	        			JOptionPane.showMessageDialog(null,"완료 날짜를 입력하십시오.");
+					else if(!mb.matches()){
+	        			JOptionPane.showMessageDialog(null,"마감 기한 입력 형식은 yyyyMMdd이며 범위는 20130101~20201231까지입니다. \n달력에 있는 날짜를 입력하세요.");
+					}
+					else if(mb.matches()){
+						inyear = clein.substring(0,4);
+						inmonth = clein.substring(4,6);
+						inday = clein.substring(6,8);
+						year = Integer.parseInt(inyear);
+						month = Integer.parseInt(inmonth);
+						day = Integer.parseInt(inday);
+						calver.set(year,month-1,1);
+						lastdayver = calver.getActualMaximum(calver.DAY_OF_MONTH);
+						if(Integer.parseInt(inday)>lastdayver){
+		        			JOptionPane.showMessageDialog(null,"완료 날짜 입력 형식은 yyyyMMdd이며 범위는 20130101~20201231까지입니다. \n달력에 있는 날짜를 입력하세요.");
 						}
-						else
-							continue;
+						else if(importancein.getText().length()==0)
+		        			JOptionPane.showMessageDialog(null,"중요도를 입력하십시오.");
+						else if(!importancein.getText().matches("[0-3]*"))
+		        			JOptionPane.showMessageDialog(null,"중요도는 0~3까지 입력할 수 있습니다.\n1 = 가장 중요(붉은색) \n2 = 중간 중요(노란색)\n3 = 약간 중요(초록색)");
+						else {
+							for(int j =0; j<m;j++) {
+								if(todosubnamein.getText().equals(subsub[j].Sub)) {
+									q+=1;
+									break;
+								}
+								else
+									continue;
+							}
+							if(q==1){
+								todosave(todotable, todosubnamein.getText(),contentin.getText(), deadlinein.getText(), finishin.getText(), clearin.getText(), importancein.getText());
+								todotodo[k]= new TODO(todosubnamein.getText(),contentin.getText(), deadlinein.getText(), finishin.getText(), clearin.getText(), importancein.getText());
+								writetodo(todotodo,k+1);
+							}
+							else
+			        			JOptionPane.showMessageDialog(null,"등록된 과목이 없습니다.");
+						}
 					}
-					if(q==1){
-						todosave(todotable, todosubnamein.getText(),contentin.getText(), deadlinein.getText(), finishin.getText(), clearin.getText(), importancein.getText());
-						todotodo[k]= new TODO(todosubnamein.getText(),contentin.getText(), deadlinein.getText(), finishin.getText(), clearin.getText(), importancein.getText());
-						writetodo(todotodo,k+1);
-					}
-					else
-	        			JOptionPane.showMessageDialog(null,"등록된 과목이 없습니다.");
-
 				}
 			}
 		}
@@ -1282,7 +1402,7 @@ class todolist extends Frame {
 			     finishin.setText((String) todotable.getValueAt(rowtodo, 3));
 			     clearin.setText((String) todotable.getValueAt(rowtodo, 4));
 			     importancein.setText((String) todotable.getValueAt(rowtodo, 5));
-			     todomodify(todotable, (String) todotable.getValueAt(rowtodo, 0));
+			     todomodify(todotable, (String) todotable.getValueAt(rowtodo, 0), (String) todotable.getValueAt(rowtodo, 1), (String) todotable.getValueAt(rowtodo, 2), (String) todotable.getValueAt(rowtodo, 3), (String) todotable.getValueAt(rowtodo, 4), (String) todotable.getValueAt(rowtodo, 5));
 			}
 		}
 	}
