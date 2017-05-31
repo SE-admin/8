@@ -397,15 +397,9 @@ class register extends Frame {
 }
 
 class todolist extends Frame {
-	private JLabel sub, subname, pro, time, year, seme, todo, todosubname, content, deadline, 
-
-finish, clear, importance, first, second, third;
-	private JButton subsave, submodify, subdelete, todosave, todomodify, tododelete, search, 
-
-sort, select, hide, unhide;
-	private JTextField subnamein, proin, timein, yearin, semein, todosubnamein, contentin, 
-
-deadlinein, finishin, clearin, importancein, context;
+	private JLabel sub, subname, pro, time, year, seme, todo, todosubname, content, deadline, finish, clear, importance, first, second, third;
+	private JButton subsave, submodify, subdelete, todosave, todomodify, tododelete, search, sort, select, hide, unhide;
+	private JTextField subnamein, proin, timein, yearin, semein, todosubnamein, contentin, deadlinein, finishin, clearin, importancein, context;
 	private JTable sublist, todolist;
 	private JScrollPane subscroll, todoscroll;
 	private JComboBox fir, sec, thi, comyear, commonth;
@@ -413,12 +407,8 @@ deadlinein, finishin, clearin, importancein, context;
 	private DefaultTableModel todotable;
 	
 	private String[] rank ={"과목명(오름차순)", "과목명(내림차순)", "마감 기한", "완료 날짜", "완료 여부", "중요도", "-"};
-	private String[] todolistname = { "과옴명", "항목명 (해야할 일)", "마감 기한", "완료 여부", 
-
-"완료 날짜", "중요도" };
-	private String[] syear = {"2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", 
-
-"2021"};
+	private String[] todolistname = { "과옴명", "항목명 (해야할 일)", "마감 기한", "완료 여부", "완료 날짜", "중요도" };
+	private String[] syear = {"2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021"};
 	private String[] smonth = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"};	
 
 		
@@ -1129,6 +1119,7 @@ deadlinein, finishin, clearin, importancein, context;
 		public void actionPerformed(ActionEvent e){
 			Object source = e.getSource();
 			int k = subtable.getRowCount();
+			int inyear = Integer.parseInt(yearin.getText());
 			if(source == subsave) {		
 				if(subnamein.getText()==null)
         			JOptionPane.showMessageDialog(null,"과목명을 입력하십시오.");
@@ -1136,10 +1127,19 @@ deadlinein, finishin, clearin, importancein, context;
         			JOptionPane.showMessageDialog(null,"담당 교수를 입력하십시오.");
 				else if(timein.getText()==null)
         			JOptionPane.showMessageDialog(null,"강의 시간 및 요일을 입력하십시오.");
+				/*else if(timein.getText()==null){
+					
+				}*/
 				else if(yearin.getText()==null)
         			JOptionPane.showMessageDialog(null,"수강 년도를 입력하십시오.");
+				else if(inyear<2013||inyear>2020){
+        			JOptionPane.showMessageDialog(null,"수강 년도의 범위는 2013년부터 2020년까지입니다.");
+				}
 				else if(semein.getText()==null)
         			JOptionPane.showMessageDialog(null,"학기를 입력하십시오");
+				else if(!semein.getText().equals("1학기")&&!semein.getText().equals("2학기")) {
+        			JOptionPane.showMessageDialog(null,"학기의 범위는 1학기, 2학기입니다.");
+				}
 				else {
 					subsave(subtable, subnamein.getText(),proin.getText(), timein.getText(), yearin.getText(), semein.getText());
 					subsub[k]= new SUB(subnamein.getText(),proin.getText(), timein.getText(), yearin.getText(), semein.getText());
