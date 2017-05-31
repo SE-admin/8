@@ -409,7 +409,7 @@ class todolist extends Frame {
 	private String[] rank ={"과목명(오름차순)", "과목명(내림차순)", "마감 기한", "완료 날짜", "완료 여부", "중요도", "-"};
 	private String[] todolistname = { "과옴명", "항목명 (해야할 일)", "마감 기한", "완료 여부", "완료 날짜", "중요도" };
 	private String[] syear = {"2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021"};
-	private String[] smonth = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"};	
+	private String[] smonth = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"};	
 
 		
 	private String[] sday = {"일", "월", "화", "수", "목", "금", "토"};
@@ -426,7 +426,7 @@ class todolist extends Frame {
 	private int todaymonth = (today.get(Calendar.MONTH)+1);
 	
 	private String toyear = Integer.toString(todayyear);
-	private String tomonth = Integer.toString(todaymonth);
+	private String tomonth = String.format("%02d", todaymonth);
 	
 	private int firstday;
 	private int lastday;
@@ -1019,13 +1019,13 @@ class todolist extends Frame {
 		}
 	}
 	
-	public void tododelete(DefaultTableModel table, String Todosubname, String Todocontent){
+	public void tododelete(DefaultTableModel table, String Todosubname, String Todocontent, String Tododeadline, String Todofinish, String Todoclear, String Todoimportance){
 		int cnt = readtodocnt();
 		System.out.println(cnt);
 		int k = table.getRowCount();
 		int i = 0;
 		for(; i<table.getRowCount(); i++){
-			    if((Todosubname.equals(table.getValueAt(i,0)))&&(Todocontent.equals(table.getValueAt(i, 1)))){
+			    if((Todosubname.equals(table.getValueAt(i,0)))&&(Todocontent.equals(table.getValueAt(i, 1)))&&(Tododeadline.equals(table.getValueAt(i, 2)))&&(Todofinish.equals(table.getValueAt(i, 3)))&&(Todoclear.equals(table.getValueAt(i, 4)))&&(Todoimportance.equals(table.getValueAt(i, 5)))){
 			     table.removeRow(i);
 			     break;
 			    }
@@ -1119,8 +1119,13 @@ class todolist extends Frame {
 		public void actionPerformed(ActionEvent e){
 			Object source = e.getSource();
 			int k = subtable.getRowCount();
-			int inyear = Integer.parseInt(yearin.getText());
+			int q = 0;
+			int inyear = 0;
 			if(source == subsave) {		
+				
+				if(yearin.getText().matches("[0-9]*"))
+					inyear = Integer.parseInt(yearin.getText());
+				
 				if(subnamein.getText()==null)
         			JOptionPane.showMessageDialog(null,"과목명을 입력하십시오.");
 				else if(proin.getText()==null)
@@ -1128,11 +1133,10 @@ class todolist extends Frame {
 				else if(timein.getText()==null)
         			JOptionPane.showMessageDialog(null,"강의 시간 및 요일을 입력하십시오.");
 				/*else if(timein.getText()==null){
-					
 				}*/
 				else if(yearin.getText()==null)
         			JOptionPane.showMessageDialog(null,"수강 년도를 입력하십시오.");
-				else if(inyear<2013||inyear>2020){
+				else if(inyear<2013||inyear>2020||!yearin.getText().matches("[0-9]*")){
         			JOptionPane.showMessageDialog(null,"수강 년도의 범위는 2013년부터 2020년까지입니다.");
 				}
 				else if(semein.getText()==null)
@@ -1141,9 +1145,17 @@ class todolist extends Frame {
         			JOptionPane.showMessageDialog(null,"학기의 범위는 1학기, 2학기입니다.");
 				}
 				else {
-					subsave(subtable, subnamein.getText(),proin.getText(), timein.getText(), yearin.getText(), semein.getText());
-					subsub[k]= new SUB(subnamein.getText(),proin.getText(), timein.getText(), yearin.getText(), semein.getText());
-					writesub(subsub,k+1);
+					for(int j =0 ; j<subtable.getRowCount(); j++){
+					    if(subnamein.getText().equals(subtable.getValueAt(j,0)))
+							q=1;
+					}
+					if(q==1)
+	        			JOptionPane.showMessageDialog(null,"이미 등록된 과목명입니다.");
+					else{
+						subsave(subtable, subnamein.getText(),proin.getText(), timein.getText(), yearin.getText(), semein.getText());
+						subsub[k]= new SUB(subnamein.getText(),proin.getText(), timein.getText(), yearin.getText(), semein.getText());
+						writesub(subsub,k+1);
+					}
 				}
 			}
 		}
@@ -1183,8 +1195,21 @@ class todolist extends Frame {
 	class subdeleteActionListener implements ActionListener {
 		public void actionPerformed(ActionEvent e){
 			Object source = e.getSource();
-			if(source == subdelete) {	
-			     subdelete(subtable, (String) subtable.getValueAt(row, 0));
+			int cnt1 = subtable.getRowCount();
+			int cnt2 = todotable.getRowCount();
+			int q = 0;
+			if(source == subdelete) {
+				for(int i = 0 ; i<cnt1 ; i++) {
+					for(int j =0; j <cnt2;j++) {
+						if(subtable.getValueAt(i, 0).equals(todotable.getValueAt(j,0)))
+							q=1;
+					}
+				}
+				if(q==1){
+        			JOptionPane.showMessageDialog(null,"항목이 있는 과목입니다.");
+				}
+				else
+					subdelete(subtable, (String) subtable.getValueAt(row, 0));
 			}
 		}
 	}
@@ -1266,7 +1291,7 @@ class todolist extends Frame {
 		public void actionPerformed(ActionEvent e){
 			Object source = e.getSource();
 			if(source == tododelete) {	
-			     tododelete(todotable, (String) todotable.getValueAt(rowtodo, 0), (String) todotable.getValueAt(rowtodo, 1));
+			     tododelete(todotable, (String) todotable.getValueAt(rowtodo, 0), (String) todotable.getValueAt(rowtodo, 1), (String) todotable.getValueAt(rowtodo, 2), (String) todotable.getValueAt(rowtodo, 3), (String) todotable.getValueAt(rowtodo, 4), (String) todotable.getValueAt(rowtodo, 5));
 			}
 		}
 	}
@@ -1301,7 +1326,9 @@ class todolist extends Frame {
 						j=Integer.parseInt(date[i].getText());
 						date[click].setBackground(new Color(150,150,150));
 						date[click].setForeground(new Color(234,204,026));
-						String datever = selyear+selmonth+date[click].getText();
+						String clickmonth = String.format("%02d", todaymonth);
+						String clickday = String.format("%02d", Integer.parseInt(date[click].getText()));
+						String datever = selyear+clickmonth+clickday;
 						search(datever, todotable);
 					}
 				}
@@ -1329,7 +1356,7 @@ class todolist extends Frame {
 		cal.set(year, month-1, 1);
 		firstday = cal.get(cal.DAY_OF_WEEK);
 		lastday = cal.getActualMaximum(cal.DAY_OF_MONTH);
-
+		
 		int j = 700;
 		int l = 125;
 		int i = 0;
