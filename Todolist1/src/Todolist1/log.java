@@ -412,9 +412,7 @@ class todolist extends Frame {
 	private String[] rank ={"과목명(오름차순)", "과목명(내림차순)", "마감 기한", "완료 날짜", "완료 여부", "중요도", "-"};
 	private String[] todolistname = { "과옴명", "항목명 (해야할 일)", "마감 기한", "완료 여부", "완료 날짜", "중요도" };
 	private String[] syear = {"2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020"};
-	private String[] smonth = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"};	
-
-		
+	private String[] smonth = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"};			
 	private String[] sday = {"일", "월", "화", "수", "목", "금", "토"};
 	
 	private String dir;
@@ -635,11 +633,13 @@ class todolist extends Frame {
 		hide = new JButton("숨기기");
 		hide.setLocation(375,290);
 		hide.setSize(75, 25);
+		hide.addActionListener(new hideActionListener());
 		add(hide);
 		
 		unhide = new JButton("보이기");
 		unhide.setLocation(455,290);
 		unhide.setSize(75, 25);
+		unhide.addActionListener(new unhideActionListener());
 		add(unhide);
 		
 		todosubname = new JLabel("과목명");
@@ -1019,10 +1019,10 @@ class todolist extends Frame {
 	}
 	
 	public void todosave(DefaultTableModel table, String Todosubname, String Todocontent, String Tododeadline, String Todofinish, String Todoclear, String Todoimportance) {
-		int k = table.getRowCount();
+		//int k = table.getRowCount();
 		Object listtodo[] = {Todosubname, Todocontent, Tododeadline, Todofinish, Todoclear, Todoimportance};
 		table.addRow(listtodo);	
-		for(int i = 0; i<k;i++){
+		/*for(int i = 0; i<k;i++){
 			if("0".equals(table.getValueAt(i,5))){
 				
 			}
@@ -1035,13 +1035,13 @@ class todolist extends Frame {
 			else{
 		
 			}
-		}
+		}*/
 	}
 	
 	public void todomodify(DefaultTableModel table, String Todosubname, String Todocontent, String Tododeadline, String Todofinish, String Todoclear, String Todoimportance){
 		int i = 0;
 		for(; i<table.getRowCount(); i++){
-			    if(Todosubname.equals(table.getValueAt(i,0))||Todocontent.equals(table.getValueAt(i,1))||Tododeadline.equals(table.getValueAt(i,2))||Todofinish.equals(table.getValueAt(i,3))||Todoclear.equals(table.getValueAt(i,4))||Todoimportance.equals(table.getValueAt(i,5)))
+			    if(Todosubname.equals(table.getValueAt(i,0))&&Todocontent.equals(table.getValueAt(i,1))&&Tododeadline.equals(table.getValueAt(i,2))&&Todofinish.equals(table.getValueAt(i,3))&&Todoclear.equals(table.getValueAt(i,4))&&Todoimportance.equals(table.getValueAt(i,5)))
 			     table.removeRow(i);
 		}
 	}
@@ -1207,7 +1207,14 @@ class todolist extends Frame {
 			Object source = e.getSource();
 			int k = subtable.getRowCount();
 			int q = 0;
+			int q1 = 0;
 			int inyear = 0;
+			String time1, time2, time3, time4, tablever;
+			String ver[] = new String[5];
+			String ver1[] = new String[5];
+			String pattern = "([01][0-9]|2[0-4]):([0-5][0-9])~([01][0-9]|2[0-4]):([0-5][0-9])/(월|화|수|목|금|토|일)";
+			Pattern p = Pattern.compile(pattern);
+			Matcher ma = p.matcher(timein.getText());
 			if(source == subsave) {		
 				if(yearin.getText().matches(".*[0-9].*"))
 					inyear = Integer.parseInt(yearin.getText());
@@ -1217,30 +1224,59 @@ class todolist extends Frame {
         			JOptionPane.showMessageDialog(null,"담당 교수를 입력하십시오.");
 				else if(timein.getText().length()==0)
         			JOptionPane.showMessageDialog(null,"강의 시간 및 요일을 입력하십시오.");
-				/*else if(timein.getText()==null){
-				}*/
-				else if(yearin.getText().length()==0)
-        			JOptionPane.showMessageDialog(null,"수강 년도를 입력하십시오.");
-				else if(inyear<2013||inyear>2020||!yearin.getText().matches(".*[0-9].*")){
-        			JOptionPane.showMessageDialog(null,"수강 년도의 범위는 2013년부터 2020년까지입니다.");
+				else if(!ma.matches()){        			
+					JOptionPane.showMessageDialog(null,"강의 시간 및 요일의 형식은 hh:mm~hh:mm/D입니다.\nex)18:00~19:00/수");
 				}
-				else if(semein.getText().length()==0)
-        			JOptionPane.showMessageDialog(null,"학기를 입력하십시오");
-				else if(!semein.getText().equals("1학기")&&!semein.getText().equals("2학기")) {
-        			JOptionPane.showMessageDialog(null,"학기의 범위는 1학기, 2학기입니다.");
-				}
-				else {
-					for(int j =0 ; j<subtable.getRowCount(); j++){
-					    if(subnamein.getText().equals(subtable.getValueAt(j,0)))
-							q=1;
+				else if(ma.matches()){
+					ver=((String)timein.getText()).split(":|~|/");
+					time1=ver[0]+ver[1];
+					time2=ver[2]+ver[3];
+					if(time1.compareTo(time2)>=0){
+						JOptionPane.showMessageDialog(null,"올바른 강의 시간 및 요일을 입력하십시오.");
 					}
-					if(q==1)
-	        			JOptionPane.showMessageDialog(null,"이미 등록된 과목명입니다.");
 					else{
-						subsave(subtable, subnamein.getText(),proin.getText(), timein.getText(), yearin.getText(), semein.getText());
-						subsub[k]= new SUB(subnamein.getText(),proin.getText(), timein.getText(), yearin.getText(), semein.getText());
-						writesub(subsub,k+1);
+						for(int a = 0; a<subtable.getRowCount();a++){
+							tablever = (String) subtable.getValueAt(a, 2);
+							ver1=(tablever).split(":|~|/");
+							for(int d= 0;d<5;d++){
+								if(ver[4].equals(ver1[4])){
+									time3=ver1[0]+ver1[1];
+									time4=ver1[2]+ver1[3];
+									if(((time1.compareTo(time3)<=0)&&(time2.compareTo(time4)>=0))||((time1.compareTo(time3)<=0)&&(time2.compareTo(time3)>=0))||((time1.compareTo(time4)<=0)&&(time2.compareTo(time4)>=0))){
+										q1 =1;
+										break;
+									}
+								}
+							}
+						}
+						if(q1==1){
+		        			JOptionPane.showMessageDialog(null,"겹치는 강의가 존재합니다.");
+						}
+						else if(yearin.getText().length()==0)
+		        			JOptionPane.showMessageDialog(null,"수강 년도를 입력하십시오.");
+						else if(inyear<2013||inyear>2020||!yearin.getText().matches(".*[0-9].*")){
+		        			JOptionPane.showMessageDialog(null,"수강 년도의 범위는 2013년부터 2020년까지입니다.");
+						}
+						else if(semein.getText().length()==0)
+		        			JOptionPane.showMessageDialog(null,"학기를 입력하십시오");
+						else if(!semein.getText().equals("1학기")&&!semein.getText().equals("2학기")) {
+		        			JOptionPane.showMessageDialog(null,"학기의 범위는 1학기, 2학기입니다.");
+						}
+						else {
+							for(int j =0 ; j<subtable.getRowCount(); j++){
+							    if(subnamein.getText().equals(subtable.getValueAt(j,0)))
+									q=1;
+							}
+							if(q==1)
+			        			JOptionPane.showMessageDialog(null,"이미 등록된 과목명입니다.");
+							else{
+								subsave(subtable, subnamein.getText(),proin.getText(), timein.getText(), yearin.getText(), semein.getText());
+								subsub[k]= new SUB(subnamein.getText(),proin.getText(), timein.getText(), yearin.getText(), semein.getText());
+								writesub(subsub,k+1);
+							}
+						}
 					}
+					
 				}
 			}
 		}
@@ -1249,7 +1285,7 @@ class todolist extends Frame {
 	class SubMouseListener implements MouseListener{   
 	    public void mouseClicked(java.awt.event.MouseEvent e) {
 	        JTable jtable = (JTable)e.getSource();
-	        row = jtable.getSelectedRow();             
+	        row = jtable.getSelectedRow(); 
 	    }
 	    public void mouseEntered(java.awt.event.MouseEvent e) {
 	    }
@@ -1303,7 +1339,6 @@ class todolist extends Frame {
 			Object source = e.getSource();
 			int k = todotable.getRowCount();
 			int m = readsubcnt();
-			int m1 = readtodocnt();
 			int q = 0;
 			int q1 = 0;
 			String pattern = "(20)(1[3-9]|20)(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])";
@@ -1319,78 +1354,78 @@ class todolist extends Frame {
         			JOptionPane.showMessageDialog(null,"과목명을 입력하십시오.");
 				else if(contentin.getText().length()==0)
         			JOptionPane.showMessageDialog(null,"항목명(해야할 일)을 입력하십시오.");
-				else if(contentin.getText().length() != 0){
-					for(int i = 0 ; i<m1;i++){
-						if(contentin.getText().equals(todotable.getValueAt(i, 1))){
-							q1=1;
-							break;
-						}
-					}
-					if(q1==1){
-	        			JOptionPane.showMessageDialog(null,"이미 있는 항목명(해야할 일)입니다.");
-					}
-					else if(deadlinein.getText().length()==0)
-	        			JOptionPane.showMessageDialog(null,"마감 기한을 입력하십시오.");
-					else if(!ma.matches()){
+				else if(deadlinein.getText().length()==0)
+        			JOptionPane.showMessageDialog(null,"마감 기한을 입력하십시오.");
+				else if(!ma.matches()){
+        			JOptionPane.showMessageDialog(null,"마감 기한 입력 형식은 yyyyMMdd이며 범위는 20130101~20201231까지입니다. \n달력에 있는 날짜를 입력하세요.");
+				}
+				else if(ma.matches()){
+					inyear = deadin.substring(0,4);
+					inmonth = deadin.substring(4,6);
+					inday = deadin.substring(6,8);
+					int year = Integer.parseInt(inyear);
+					int month = Integer.parseInt(inmonth);
+					int day = Integer.parseInt(inday);
+					calver.set(year,month-1,1);
+					int lastdayver = calver.getActualMaximum(calver.DAY_OF_MONTH);
+					if(Integer.parseInt(inday)>lastdayver){
 	        			JOptionPane.showMessageDialog(null,"마감 기한 입력 형식은 yyyyMMdd이며 범위는 20130101~20201231까지입니다. \n달력에 있는 날짜를 입력하세요.");
 					}
-					else if(ma.matches()){
-						inyear = deadin.substring(0,4);
-						inmonth = deadin.substring(4,6);
-						inday = deadin.substring(6,8);
-						int year = Integer.parseInt(inyear);
-						int month = Integer.parseInt(inmonth);
-						int day = Integer.parseInt(inday);
-						calver.set(year,month-1,1);
-						int lastdayver = calver.getActualMaximum(calver.DAY_OF_MONTH);
-						if(Integer.parseInt(inday)>lastdayver){
-		        			JOptionPane.showMessageDialog(null,"마감 기한 입력 형식은 yyyyMMdd이며 범위는 20130101~20201231까지입니다. \n달력에 있는 날짜를 입력하세요.");
-						}
-						else if(finishin.getText().length()==0)
-		        			JOptionPane.showMessageDialog(null,"완료 여부를 입력하십시오.");
-						else if(!finishin.getText().matches("[o|x]*"))
-		        			JOptionPane.showMessageDialog(null,"완료 여부는 o,x만 가능합니다.");
-						else if(clearin.getText().length()==0)
-							JOptionPane.showMessageDialog(null,"완료 날짜를 입력하십시오.\n완료한 경우에는 날짜를 입력하시고 미완료한  경우에는 x를 입력하십시오.");
-						else if(mb.matches()||(clearin.getText().equals("x"))){
-							if(mb.matches()){
-								inyear = clein.substring(0,4);
-								inmonth = clein.substring(4,6);
-								inday = clein.substring(6,8);
-								year = Integer.parseInt(inyear);
-								month = Integer.parseInt(inmonth);
-								day = Integer.parseInt(inday);
-								calver.set(year,month-1,1);
-								lastdayver = calver.getActualMaximum(calver.DAY_OF_MONTH);
-								if(Integer.parseInt(inday)>lastdayver){
-				        			JOptionPane.showMessageDialog(null,"완료 날짜 입력 형식은 yyyyMMdd이며 범위는 20130101~20201231까지입니다. \n달력에 있는 날짜를 입력하세요.");
-								}
+					else if(finishin.getText().length()==0)
+	        			JOptionPane.showMessageDialog(null,"완료 여부를 입력하십시오.");
+					else if(!finishin.getText().matches("[o|x]*"))
+	        			JOptionPane.showMessageDialog(null,"완료 여부는 o,x만 가능합니다.");
+					else if(clearin.getText().length()==0)
+						JOptionPane.showMessageDialog(null,"완료 날짜를 입력하십시오.\n완료한 경우에는 날짜를 입력하시고 미완료한  경우에는 x를 입력하십시오.");
+					else if(mb.matches()||(clearin.getText().equals("x"))){
+						if(mb.matches()){
+							inyear = clein.substring(0,4);
+							inmonth = clein.substring(4,6);
+							inday = clein.substring(6,8);
+							year = Integer.parseInt(inyear);
+							month = Integer.parseInt(inmonth);
+							day = Integer.parseInt(inday);
+							calver.set(year,month-1,1);
+							lastdayver = calver.getActualMaximum(calver.DAY_OF_MONTH);
+							if(Integer.parseInt(inday)>lastdayver){
+			        			JOptionPane.showMessageDialog(null,"완료 날짜 입력 형식은 yyyyMMdd이며 범위는 20130101~20201231까지입니다. \n달력에 있는 날짜를 입력하세요.");
 							}
-							else if(importancein.getText().length()==0)
-			        			JOptionPane.showMessageDialog(null,"중요도를 입력하십시오.");
-							else if(!importancein.getText().matches("[1-3]*"))
-			        			JOptionPane.showMessageDialog(null,"중요도는 1~3까지 입력할 수 있습니다.\n1 = 가장 중요(붉은색) \n2 = 중간 중요(노란색)\n3 = 약간 중요(초록색)");
-							else {
-								for(int j =0; j<m;j++) {
-									if(todosubnamein.getText().equals(subsub[j].Sub)) {
-										q+=1;
+						}
+						else if(importancein.getText().length()==0)
+		        			JOptionPane.showMessageDialog(null,"중요도를 입력하십시오.");
+						else if(!importancein.getText().matches("[0-3]*"))
+		        			JOptionPane.showMessageDialog(null,"중요도는 0~3까지 입력할 수 있습니다.\n0 = 중요하지 않음(흰색)\n1 = 가장 중요(붉은색) \n2 = 중간 중요(노란색)\n3 = 약간 중요(초록색)");
+						else {
+							for(int j =0; j<m;j++) {
+								if(todosubnamein.getText().equals(subsub[j].Sub)) {
+									q+=1;
+									break;
+								}
+								else
+									continue;
+							}
+							if(q==1){
+								for(int i = 0 ; i<todotable.getRowCount();i++){
+									if(contentin.getText().equals(todotable.getValueAt(i, 1))){
+										q1=1;
 										break;
 									}
-									else
-										continue;
 								}
-								if(q==1){
+								if(q1==1){
+				        			JOptionPane.showMessageDialog(null,"이미 있는 항목명(해야할 일)입니다.");
+								}
+								else{
 									todosave(todotable, todosubnamein.getText(),contentin.getText(), deadlinein.getText(), finishin.getText(), clearin.getText(), importancein.getText());
 									todotodo[k]= new TODO(todosubnamein.getText(),contentin.getText(), deadlinein.getText(), finishin.getText(), clearin.getText(), importancein.getText());
 									writetodo(todotodo,k+1);
 								}
-								else
-				        			JOptionPane.showMessageDialog(null,"등록된 과목이 없습니다.");
 							}
+							else
+			        			JOptionPane.showMessageDialog(null,"등록된 과목이 없습니다.");
 						}
-						else if(!mb.matches()){
-		        			JOptionPane.showMessageDialog(null,"마감 기한 입력 형식은 yyyyMMdd이며 범위는 20130101~20201231까지입니다. \n달력에 있는 날짜를 입력하세요.");
-						}
+					}
+					else if(!mb.matches()){
+	        			JOptionPane.showMessageDialog(null,"마감 기한 입력 형식은 yyyyMMdd이며 범위는 20130101~20201231까지입니다. \n달력에 있는 날짜를 입력하세요.");
 					}
 				}
 			}
@@ -1486,6 +1521,35 @@ class todolist extends Frame {
 			}
 		}
 	}
+	class hideActionListener implements ActionListener {
+		public void actionPerformed(ActionEvent e){
+			Object source = e.getSource();
+			int cnt = readtodocnt();
+			todotable.setRowCount(0);
+			if(source == hide) {	
+				for(int j = 0; j<cnt ; j++){
+					if(todotodo[j].Todofinish.equals("o")){
+						continue;
+					}
+					else
+						todosave(todotable, todotodo[j].Todosubname, todotodo[j].Todocontent, todotodo[j].Tododeadline, todotodo[j].Todofinish, todotodo[j].Todoclear, todotodo[j].Todoimportance);
+				}
+			}
+		}
+	}
+	class unhideActionListener implements ActionListener {
+		public void actionPerformed(ActionEvent e){
+			Object source = e.getSource();
+			int cnt = readtodocnt();
+			todotable.setRowCount(0);
+			if(source == unhide) {	
+				for(int j = 0; j<cnt ; j++){
+					todosave(todotable, todotodo[j].Todosubname, todotodo[j].Todocontent, todotodo[j].Tododeadline, todotodo[j].Todofinish, todotodo[j].Todoclear, todotodo[j].Todoimportance);
+				}
+			}
+		}
+	}
+	
 	
 	public void today(int year, int month) {
 		GregorianCalendar cal;
