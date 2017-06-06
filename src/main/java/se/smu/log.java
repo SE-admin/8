@@ -3901,16 +3901,15 @@ class todolist extends Frame {
 					calver.set(year, month - 1, 1);
 					int lastdayver = calver.getActualMaximum(calver.DAY_OF_MONTH);
 					if (Integer.parseInt(inday) > lastdayver) {
-						JOptionPane.showMessageDialog(null,
-								"마감 기한 입력 형식은 yyyyMMdd이며 범위는 20130101~20201231까지입니다. \n달력에 있는 날짜를 입력하세요.");
-					} else if (finishin.getText().length() == 0)
+						JOptionPane.showMessageDialog(null,"마감 기한 입력 형식은 yyyyMMdd이며 범위는 20130101~20201231까지입니다. \n달력에 있는 날짜를 입력하세요.");
+					} 
+					else if (finishin.getText().length() == 0)
 						JOptionPane.showMessageDialog(null, "완료 여부를 입력하십시오.");
 					else if (!finishin.getText().matches("[o|x]*"))
 						JOptionPane.showMessageDialog(null, "완료 여부는 o,x만 가능합니다.");
 					else if (clearin.getText().length() == 0)
 						JOptionPane.showMessageDialog(null, "완료 날짜를 입력하십시오.\n완료한 경우에는 날짜를 입력하시고 미완료한  경우에는 x를 입력하십시오.");
-					else if (mb.matches() || (clearin.getText().equals("x"))) {
-						if (mb.matches()) {
+					else if (mb.matches()) {
 							inyear = clein.substring(0, 4);
 							inmonth = clein.substring(4, 6);
 							inday = clein.substring(6, 8);
@@ -3920,9 +3919,9 @@ class todolist extends Frame {
 							calver.set(year, month - 1, 1);
 							lastdayver = calver.getActualMaximum(calver.DAY_OF_MONTH);
 							if (Integer.parseInt(inday) > lastdayver) {
-								JOptionPane.showMessageDialog(null,
-										"완료 날짜 입력 형식은 yyyyMMdd이며 범위는 20130101~20201231까지입니다. \n달력에 있는 날짜를 입력하세요.");
-							} else if (importancein.getText().length() == 0)
+								JOptionPane.showMessageDialog(null,"완료 날짜 입력 형식은 yyyyMMdd이며 범위는 20130101~20201231까지입니다. \n달력에 있는 날짜를 입력하세요.");
+							} 
+							else if (importancein.getText().length() == 0)
 								JOptionPane.showMessageDialog(null, "중요도를 입력하십시오.");
 							else if (!importancein.getText().matches("[0-3]*"))
 								JOptionPane.showMessageDialog(null,
@@ -3944,21 +3943,23 @@ class todolist extends Frame {
 									}
 									if (q1 == 1) {
 										JOptionPane.showMessageDialog(null, "이미 있는 항목명(해야할 일)입니다.");
-									} else {
-										todosave(todotable, todosubnamein.getText(), contentin.getText(),
-												deadlinein.getText(), finishin.getText(), clearin.getText(),
-												importancein.getText());
-										writetodo(todotodo, k + 1);
+									} 
+									else {
+										todosave(todotable, todosubnamein.getText(), contentin.getText(), deadlinein.getText(), finishin.getText(), clearin.getText(), importancein.getText());
+										todotodo[k] = new TODO(todosubnamein.getText(), contentin.getText(), deadlinein.getText(), finishin.getText(), clearin.getText(), importancein.getText());
+										writetodo(todotodo, todotable.getRowCount());
 										readtodo(todotodo);
 									}
-								} else
+								} 
+								else
 									JOptionPane.showMessageDialog(null, "등록된 과목이 없습니다.");
-							}
-						} else if (importancein.getText().length() == 0)
+							}	
+						}
+					else if((clearin.getText().equals("x"))){
+						if (importancein.getText().length() == 0)
 							JOptionPane.showMessageDialog(null, "중요도를 입력하십시오.");
 						else if (!importancein.getText().matches("[0-3]*"))
-							JOptionPane.showMessageDialog(null,
-									"중요도는 0~3까지 입력할 수 있습니다.\n0 = 중요하지 않음(흰색)\n1 = 가장 중요(붉은색) \n2 = 중간 중요(노란색)\n3 = 약간 중요(초록색)");
+							JOptionPane.showMessageDialog(null,"중요도는 0~3까지 입력할 수 있습니다.\n0 = 중요하지 않음\n1 = 가장 중요 \n2 = 중간 중요\n3 = 약간 중요");
 						else {
 							for (int j = 0; j < m; j++) {
 								if (todosubnamein.getText().equals(subsub[j].Sub)) {
@@ -3980,11 +3981,14 @@ class todolist extends Frame {
 									todosave(todotable, todosubnamein.getText(), contentin.getText(), deadlinein.getText(), finishin.getText(), clearin.getText(), importancein.getText());
 									todotodo[k] = new TODO(todosubnamein.getText(), contentin.getText(), deadlinein.getText(), finishin.getText(), clearin.getText(), importancein.getText());
 									writetodo(todotodo, todotable.getRowCount());
+									readtodo(todotodo);
 								}
 							} else
 								JOptionPane.showMessageDialog(null, "등록된 과목이 없습니다.");
 						}
-					} else if (!mb.matches()) {
+					}
+					
+					else if (!mb.matches()) {
 						JOptionPane.showMessageDialog(null, "완료 기한 입력 형식은 yyyyMMdd이며 범위는 20130101~20201231까지입니다. \n달력에 있는 날짜를 입력하세요.");
 					}
 				}
