@@ -3799,6 +3799,11 @@ class todolist extends Frame {
 								subsub[k] = new SUB(subnamein.getText(), proin.getText(), timein.getText(),
 										yearin.getText(), semein.getText());
 								writesub(subsub, subtable.getRowCount());
+								subnamein.setText("");
+								proin.setText("");
+								timein.setText("");
+								yearin.setText("");
+								semein.setText("");
 							}
 						}
 					}
@@ -3833,19 +3838,24 @@ class todolist extends Frame {
 			int i = readsubcnt();
 			int j = 0;
 			if (source == submodify) {
-				if(row<=subtable.getRowCount()&&row>=0){
-					subnamein.setText((String) subtable.getValueAt(row, 0));
-					proin.setText((String) subtable.getValueAt(row, 1));
-					timein.setText((String) subtable.getValueAt(row, 2));
-					yearin.setText((String) subtable.getValueAt(row, 3));
-					semein.setText((String) subtable.getValueAt(row, 4));
-					submodify(subtable, (String) subtable.getValueAt(row, 0), (String) subtable.getValueAt(row, 1),
-						(String) subtable.getValueAt(row, 2), (String) subtable.getValueAt(row, 3),
-						(String) subtable.getValueAt(row, 4));
-				row=10000;
+				if(subnamein.getText().length()!=0){
+					JOptionPane.showMessageDialog(null, "수정중인 과목이 있습니다.");
 				}
-				else
-					JOptionPane.showMessageDialog(null, "원하는 과목을 선택하세요.");
+				else{
+					if(row<=subtable.getRowCount()&&row>=0){
+						subnamein.setText((String) subtable.getValueAt(row, 0));
+						proin.setText((String) subtable.getValueAt(row, 1));
+						timein.setText((String) subtable.getValueAt(row, 2));
+						yearin.setText((String) subtable.getValueAt(row, 3));
+						semein.setText((String) subtable.getValueAt(row, 4));
+						submodify(subtable, (String) subtable.getValueAt(row, 0), (String) subtable.getValueAt(row, 1),
+							(String) subtable.getValueAt(row, 2), (String) subtable.getValueAt(row, 3),
+							(String) subtable.getValueAt(row, 4));
+						row=10000;
+					}
+					else
+						JOptionPane.showMessageDialog(null, "원하는 과목을 선택하세요.");
+				}
 			}
 		}
 	}
@@ -3958,6 +3968,12 @@ class todolist extends Frame {
 										todotodo[k] = new TODO(todosubnamein.getText(), contentin.getText(), deadlinein.getText(), finishin.getText(), clearin.getText(), importancein.getText());
 										writetodo(todotodo, todotable.getRowCount());
 										readtodo(todotodo);
+										todosubnamein.setText("");
+										contentin.setText("");
+										deadlinein.setText("");
+										finishin.setText("");
+										clearin.setText("");
+										importancein.setText("");
 									}
 								} 
 								else
@@ -3991,6 +4007,12 @@ class todolist extends Frame {
 									todotodo[k] = new TODO(todosubnamein.getText(), contentin.getText(), deadlinein.getText(), finishin.getText(), clearin.getText(), importancein.getText());
 									writetodo(todotodo, todotable.getRowCount());
 									readtodo(todotodo);
+									todosubnamein.setText("");
+									contentin.setText("");
+									deadlinein.setText("");
+									finishin.setText("");
+									clearin.setText("");
+									importancein.setText("");
 								}
 							} else
 								JOptionPane.showMessageDialog(null, "등록된 과목이 없습니다.");
@@ -4030,21 +4052,26 @@ class todolist extends Frame {
 			int i = readtodocnt();
 			int j = 0;
 			if (source == todomodify) {
-				if(rowtodo<=todotable.getRowCount()&&rowtodo>=0){
-					todosubnamein.setText((String) todotable.getValueAt(rowtodo, 0));
-					contentin.setText((String) todotable.getValueAt(rowtodo, 1));
-					deadlinein.setText((String) todotable.getValueAt(rowtodo, 2));
-					finishin.setText((String) todotable.getValueAt(rowtodo, 3));
-					clearin.setText((String) todotable.getValueAt(rowtodo, 4));
-					importancein.setText((String) todotable.getValueAt(rowtodo, 5));
-					todomodify(todotable, (String) todotable.getValueAt(rowtodo, 0),
-					(String) todotable.getValueAt(rowtodo, 1), (String) todotable.getValueAt(rowtodo, 2),
-					(String) todotable.getValueAt(rowtodo, 3), (String) todotable.getValueAt(rowtodo, 4),
-					(String) todotable.getValueAt(rowtodo, 5));
-					rowtodo=10000;
+				if(todosubnamein.getText().length()!=0){
+					JOptionPane.showMessageDialog(null, "수정중인 항목이 있습니다.");
 				}
-				else
-					JOptionPane.showMessageDialog(null, "원하는 항목을 선택하세요.");
+				else{
+					if(rowtodo<=todotable.getRowCount()&&rowtodo>=0){
+						todosubnamein.setText((String) todotable.getValueAt(rowtodo, 0));
+						contentin.setText((String) todotable.getValueAt(rowtodo, 1));
+						deadlinein.setText((String) todotable.getValueAt(rowtodo, 2));
+						finishin.setText((String) todotable.getValueAt(rowtodo, 3));
+						clearin.setText((String) todotable.getValueAt(rowtodo, 4));
+						importancein.setText((String) todotable.getValueAt(rowtodo, 5));
+						todomodify(todotable, (String) todotable.getValueAt(rowtodo, 0),
+						(String) todotable.getValueAt(rowtodo, 1), (String) todotable.getValueAt(rowtodo, 2),
+						(String) todotable.getValueAt(rowtodo, 3), (String) todotable.getValueAt(rowtodo, 4),
+						(String) todotable.getValueAt(rowtodo, 5));
+						rowtodo=10000;
+					}
+					else
+						JOptionPane.showMessageDialog(null, "원하는 항목을 선택하세요.");
+				}
 			}
 		}
 	}
