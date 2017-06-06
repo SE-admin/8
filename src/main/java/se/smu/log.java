@@ -426,8 +426,8 @@ class todolist extends Frame {
 	private int hiding=0;
 	
 	private String dir;
-	private int row;
-	private int rowtodo;
+	private int row=10000;
+	private int rowtodo=10000;
 	private Calendar today = Calendar.getInstance();
 
 	private JLabel day[] = new JLabel[7];
@@ -1066,9 +1066,8 @@ class todolist extends Frame {
 			} else {
 				out.write("ForDefaultToFile ");
 				for (int i = 0; i < cnt; i++) {
-					out.write(" " + (String)todotable.getValueAt(i, 0) + " " + (String)todotable.getValueAt(i, 1) + " "
-							+ (String)todotable.getValueAt(i, 2) + " " + (String)todotable.getValueAt(i, 3) + " " + (String)todotable.getValueAt(i, 4)
-							+ " " + (String)todotable.getValueAt(i, 5) + " ");
+					out.write(" " + (String)todotable.getValueAt(i, 0) + " " + (String)todotable.getValueAt(i, 1) + " "+ (String)todotable.getValueAt(i, 2) + " " + (String)todotable.getValueAt(i, 3) + " " + (String)todotable.getValueAt(i, 4)
++ " " + (String)todotable.getValueAt(i, 5) + " ");
 					todotodo[i].Todosubname = (String)todotable.getValueAt(i, 0);
 					todotodo[i].Todocontent = (String)todotable.getValueAt(i, 1);
 					todotodo[i].Tododeadline = (String)todotable.getValueAt(i, 2);
@@ -3834,14 +3833,19 @@ class todolist extends Frame {
 			int i = readsubcnt();
 			int j = 0;
 			if (source == submodify) {
-				subnamein.setText((String) subtable.getValueAt(row, 0));
-				proin.setText((String) subtable.getValueAt(row, 1));
-				timein.setText((String) subtable.getValueAt(row, 2));
-				yearin.setText((String) subtable.getValueAt(row, 3));
-				semein.setText((String) subtable.getValueAt(row, 4));
-				submodify(subtable, (String) subtable.getValueAt(row, 0), (String) subtable.getValueAt(row, 1),
+				if(row<=subtable.getRowCount()&&row>=0){
+					subnamein.setText((String) subtable.getValueAt(row, 0));
+					proin.setText((String) subtable.getValueAt(row, 1));
+					timein.setText((String) subtable.getValueAt(row, 2));
+					yearin.setText((String) subtable.getValueAt(row, 3));
+					semein.setText((String) subtable.getValueAt(row, 4));
+					submodify(subtable, (String) subtable.getValueAt(row, 0), (String) subtable.getValueAt(row, 1),
 						(String) subtable.getValueAt(row, 2), (String) subtable.getValueAt(row, 3),
 						(String) subtable.getValueAt(row, 4));
+				row=10000;
+				}
+				else
+					JOptionPane.showMessageDialog(null, "원하는 과목을 선택하세요.");
 			}
 		}
 	}
@@ -3853,15 +3857,20 @@ class todolist extends Frame {
 			int cnt2 = todotable.getRowCount();
 			int q = 0;
 			if (source == subdelete) {
-				for (int j = 0; j < cnt2; j++) {
-					if (subtable.getValueAt(row, 0).equals(todotable.getValueAt(j, 0))) {
-						q = 1;
+				if(row<=subtable.getRowCount()&&row>=0){
+					for (int j = 0; j < cnt2; j++) {
+						if (subtable.getValueAt(row, 0).equals(todotable.getValueAt(j, 0))) {
+							q = 1;
+						}
 					}
+					if (q == 1) {
+						JOptionPane.showMessageDialog(null, "항목이 있는 과목입니다.");
+					} 
+					else
+						subdelete(subtable, (String) subtable.getValueAt(row, 0));
 				}
-				if (q == 1) {
-					JOptionPane.showMessageDialog(null, "항목이 있는 과목입니다.");
-				} else
-					subdelete(subtable, (String) subtable.getValueAt(row, 0));
+				else
+					JOptionPane.showMessageDialog(null, "원하는 과목을 선택하세요.");
 			}
 		}
 	}
@@ -3989,7 +3998,7 @@ class todolist extends Frame {
 					}
 					
 					else if (!mb.matches()) {
-						JOptionPane.showMessageDialog(null, "완료 기한 입력 형식은 yyyyMMdd이며 범위는 20130101~20201231까지입니다. \n달력에 있는 날짜를 입력하세요.");
+						JOptionPane.showMessageDialog(null, "완료 날짜 입력 형식은 yyyyMMdd이며 범위는 20130101~20201231까지입니다. \n달력에 있는 날짜를 입력하세요.");
 					}
 				}
 			}
@@ -4021,16 +4030,21 @@ class todolist extends Frame {
 			int i = readtodocnt();
 			int j = 0;
 			if (source == todomodify) {
-				todosubnamein.setText((String) todotable.getValueAt(rowtodo, 0));
-				contentin.setText((String) todotable.getValueAt(rowtodo, 1));
-				deadlinein.setText((String) todotable.getValueAt(rowtodo, 2));
-				finishin.setText((String) todotable.getValueAt(rowtodo, 3));
-				clearin.setText((String) todotable.getValueAt(rowtodo, 4));
-				importancein.setText((String) todotable.getValueAt(rowtodo, 5));
-				todomodify(todotable, (String) todotable.getValueAt(rowtodo, 0),
-						(String) todotable.getValueAt(rowtodo, 1), (String) todotable.getValueAt(rowtodo, 2),
-						(String) todotable.getValueAt(rowtodo, 3), (String) todotable.getValueAt(rowtodo, 4),
-						(String) todotable.getValueAt(rowtodo, 5));
+				if(rowtodo<=todotable.getRowCount()&&rowtodo>=0){
+					todosubnamein.setText((String) todotable.getValueAt(rowtodo, 0));
+					contentin.setText((String) todotable.getValueAt(rowtodo, 1));
+					deadlinein.setText((String) todotable.getValueAt(rowtodo, 2));
+					finishin.setText((String) todotable.getValueAt(rowtodo, 3));
+					clearin.setText((String) todotable.getValueAt(rowtodo, 4));
+					importancein.setText((String) todotable.getValueAt(rowtodo, 5));
+					todomodify(todotable, (String) todotable.getValueAt(rowtodo, 0),
+					(String) todotable.getValueAt(rowtodo, 1), (String) todotable.getValueAt(rowtodo, 2),
+					(String) todotable.getValueAt(rowtodo, 3), (String) todotable.getValueAt(rowtodo, 4),
+					(String) todotable.getValueAt(rowtodo, 5));
+					rowtodo=10000;
+				}
+				else
+					JOptionPane.showMessageDialog(null, "원하는 항목을 선택하세요.");
 			}
 		}
 	}
@@ -4039,10 +4053,15 @@ class todolist extends Frame {
 		public void actionPerformed(ActionEvent e) {
 			Object source = e.getSource();
 			if (source == tododelete) {
+				if(rowtodo<=todotable.getRowCount()&&rowtodo>=0){
 				tododelete(todotable, (String) todotable.getValueAt(rowtodo, 0),
 						(String) todotable.getValueAt(rowtodo, 1), (String) todotable.getValueAt(rowtodo, 2),
 						(String) todotable.getValueAt(rowtodo, 3), (String) todotable.getValueAt(rowtodo, 4),
 						(String) todotable.getValueAt(rowtodo, 5));
+				rowtodo=10000;
+				}
+				else
+					JOptionPane.showMessageDialog(null, "원하는 항목을 선택하세요.");
 			}
 		}
 	}
